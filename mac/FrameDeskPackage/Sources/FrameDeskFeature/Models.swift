@@ -28,7 +28,10 @@ public struct DeskEvent: Codable, Hashable, Sendable, Identifiable {
 public struct DeskArt: Codable, Hashable, Sendable {
     public var title: String
     public var artist: String
+    public var date: String?
     public var image: String
+    public var fact: String?
+    public var factSource: String?
 }
 
 public struct DeskDay: Codable, Hashable, Sendable, Identifiable {

@@ -84,6 +84,12 @@ public final class DeskModel {
 
     private func short(_ s: String) -> String { s.count > 18 ? String(s.prefix(17)) + "…" : s }
 
+    /// The painting image, served by the dashboard itself.
+    func artURL(_ art: DeskArt) -> URL? {
+        guard let base = URL(string: baseURL.trimmingCharacters(in: .whitespaces)) else { return nil }
+        return base.appending(path: art.image)
+    }
+
     // MARK: Loops
 
     private func startLoops() {

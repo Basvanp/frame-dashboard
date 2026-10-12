@@ -16,6 +16,7 @@ public struct DeskView: View {
                 hero
                 TasksTile(model: model)
                 MeetingsTile(model: model)
+                if let art = model.shownDay?.art { ArtTile(model: model, art: art) }
                 WeekStrip(model: model)
                 footer
             }
@@ -287,6 +288,53 @@ struct MeetingsTile: View {
             }
         }
         .tile()
+    }
+}
+
+// MARK: - Today's painting, as on the TV
+
+struct ArtTile: View {
+    let model: DeskModel
+    let art: DeskArt
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            AsyncImage(url: model.artURL(art)) { image in
+                image.resizable().scaledToFill()
+            } placeholder: {
+                Theme.tileHi
+            }
+            .frame(width: 64, height: 64)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(Theme.stroke))
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(art.title)
+                    .font(Theme.serif(14.5))
+                    .foregroundStyle(Theme.ink)
+                    .lineLimit(1)
+                Text([art.artist, art.date].compactMap { $0 }.joined(separator: ", "))
+                    .font(.system(size: 11.5))
+                    .foregroundStyle(Theme.ink2)
+                    .lineLimit(1)
+                if let fact = art.fact {
+                    Text(fact)
+                        .font(.system(size: 11.5))
+                        .foregroundStyle(Theme.ink3)
+                        .lineLimit(3)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.top, 2)
+                }
+            }
+            Spacer(minLength: 0)
+            if let s = art.factSource, let url = URL(string: s) {
+                Link(destination: url) {
+                    Image(systemName: "arrow.up.right").font(.system(size: 10, weight: .semibold)).foregroundStyle(Theme.ink3)
+                }
+                .help("Read more on Wikipedia")
+            }
+        }
+        .tile(padding: 12)
     }
 }
 

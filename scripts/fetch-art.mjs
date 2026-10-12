@@ -13,6 +13,10 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 const UA = { 'user-agent': 'frame-dashboard (open-source TV dashboard)' };
 const WIDTH = 1920; // one of Commons' standard thumbnail steps; the day view fills the screen
 const catalog = JSON.parse(readFileSync('art/catalog.json', 'utf8'));
+// One sentence per work, each taken from the Wikipedia article in `source`
+// (CC BY-SA; the screen credits Wikipedia). Written by hand from the article
+// text, never invented: a work with nothing new to say has no entry.
+const facts = existsSync('art/facts.json') ? JSON.parse(readFileSync('art/facts.json', 'utf8')) : {};
 mkdirSync('public/art', { recursive: true });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -73,6 +77,8 @@ for (const w of catalog) {
     ratio: Number((meta.width / meta.height).toFixed(3)),
     image: `art/${w.slug}.jpg`,
     source: meta.descriptionurl,
+    fact: facts[w.slug]?.fact || null,
+    factSource: facts[w.slug]?.source || null,
   });
 }
 

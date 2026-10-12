@@ -339,6 +339,12 @@
       $('credit-meta').textContent = [art.artist + (art.date ? ', ' + art.date : ''), art.collection]
         .filter(Boolean)
         .join(' · ');
+      var factEl = $('credit-fact');
+      clear(factEl);
+      if (art.fact) {
+        factEl.appendChild(document.createTextNode(art.fact));
+        factEl.appendChild(el('span', 'via', 'Wikipedia'));
+      }
 
       requestAnimationFrame(function () {
         requestAnimationFrame(function () {
