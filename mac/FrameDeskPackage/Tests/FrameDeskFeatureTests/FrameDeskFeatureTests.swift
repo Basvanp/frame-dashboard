@@ -42,7 +42,10 @@ import SwiftUI
                            events: [ev("Team standup", "2026-10-12T15:30:00Z", "2026-10-12T15:45:00Z"),
                                     ev("Design review — onboarding", "2026-10-12T17:30:00Z", "2026-10-12T18:30:00Z"),
                                     ev("Client call — quarterly plan", "2026-10-12T22:30:00Z", "2026-10-12T23:15:00Z")],
-                           art: nil)
+                           art: DeskArt(title: "An Ancient Picture of the Boat Bridge at Sano", artist: "Katsushika Hokusai",
+                                        date: "early 1830s", image: "art/x.jpg",
+                                        fact: "One of eleven prints in the series Curious Views of Famous Bridges.",
+                                        factSource: "https://clevelandart.org/art/1940.1001"))
         }
         return DeskDay(date: date, focus: nil, tasks: [], events: n < 17 ? [ev("x", "2026-10-\(n)T15:30:00Z", "2026-10-\(n)T15:45:00Z", date)] : [], art: nil)
     }

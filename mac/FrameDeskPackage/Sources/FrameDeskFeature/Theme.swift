@@ -18,8 +18,11 @@ enum Theme {
         startPoint: .leading, endPoint: .trailing
     )
 
-    static func serif(_ size: CGFloat) -> Font { .system(size: size, weight: .regular, design: .serif).italic() }
-    static func label() -> Font { .system(size: 10.5, weight: .semibold).width(.expanded) }
+    /// Instrument Serif, the TV's display face: clock, dates, titles.
+    static func display(_ size: CGFloat) -> Font { .custom("InstrumentSerif-Regular", size: size) }
+    static func serif(_ size: CGFloat) -> Font { .custom("InstrumentSerif-Italic", size: size) }
+    /// Small caps labels: system font, a touch of tracking, never wide.
+    static func label() -> Font { .system(size: 10.5, weight: .semibold) }
 }
 
 struct TileStyle: ViewModifier {
@@ -42,7 +45,7 @@ struct Kicker: View {
     var trailing: String? = nil
     var body: some View {
         HStack {
-            Text(text.uppercased()).font(Theme.label()).tracking(1.2).foregroundStyle(Theme.ink3)
+            Text(text.uppercased()).font(Theme.label()).tracking(0.9).foregroundStyle(Theme.ink3)
             Spacer()
             if let trailing { Text(trailing).font(.system(size: 11)).foregroundStyle(Theme.ink3) }
         }

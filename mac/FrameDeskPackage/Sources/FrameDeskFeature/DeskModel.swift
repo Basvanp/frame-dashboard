@@ -26,6 +26,7 @@ public final class DeskModel {
     private var pendingCalendarSync: Task<Void, Never>?
 
     public init() {
+        Fonts.register()
         baseURL = UserDefaults.standard.string(forKey: "baseURL") ?? ""
         calendarSyncOn = UserDefaults.standard.object(forKey: "calendarSync") as? Bool ?? true
         hasKey = Keychain.read() != nil
@@ -35,6 +36,7 @@ public final class DeskModel {
 
     /// For previews and snapshot tests: fixed data, no network, no timers.
     init(preview week: DeskWeek, now: Date) {
+        Fonts.register()
         baseURL = "https://example.com"
         calendarSyncOn = true
         hasKey = true
@@ -89,9 +91,13 @@ public final class DeskModel {
     private func short(_ s: String) -> String { s.count > 18 ? String(s.prefix(17)) + "…" : s }
 
     /// The painting image, served by the dashboard itself.
+    /// `art.image` is relative to the dashboard ("art/x.jpg" or
+    /// "_vercel/image?url=…") or, in local development, absolute. Resolve it
+    /// as a URL reference so the query string survives.
     func artURL(_ art: DeskArt) -> URL? {
-        guard let base = URL(string: baseURL.trimmingCharacters(in: .whitespaces)) else { return nil }
-        return base.appending(path: art.image)
+        var base = baseURL.trimmingCharacters(in: .whitespaces)
+        if !base.hasSuffix("/") { base += "/" }
+        return URL(string: art.image, relativeTo: URL(string: base))?.absoluteURL
     }
 
     // MARK: Loops
@@ -208,7 +214,9 @@ public final class DeskModel {
         pendingCalendarSync = Task { [weak self] in
             try? await Task.sleep(for: .seconds(seconds))
             guard !Task.isCancelled, let self else { return }
-            await self.syncCalendar()
+            // Run the sync in its own task: rescheduling cancels the wait,
+            // never a sync already on the wire.
+            await Task { await self.syncCalendar() }.value
             // And again every 10 minutes, in case nothing fires a change.
             self.scheduleCalendarSync(after: 600)
         }
@@ -228,6 +236,10 @@ public final class DeskModel {
             try await api.save(EventsDoc(weekOf: week.weekOf, source: "Frame Desk (Mac)", events: events))
             calendarStatus = nil
             await refresh()
+        } catch is CancellationError {
+            // Superseded by a newer sync; not a problem worth showing.
+        } catch let error as URLError where error.code == .cancelled {
+            // Same, from URLSession.
         } catch {
             calendarStatus = error.localizedDescription
         }

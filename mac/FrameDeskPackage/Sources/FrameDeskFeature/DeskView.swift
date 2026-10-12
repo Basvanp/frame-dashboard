@@ -1,6 +1,8 @@
 import SwiftUI
 
-/// The popover under the menu bar icon.
+/// The popover under the menu bar icon. It opens on today's painting — the
+/// same one on the TV — with the day set over it, then the day's work below
+/// as editorial sections rather than boxes.
 public struct DeskView: View {
     @Bindable var model: DeskModel
     @State private var showSettings = false
@@ -8,127 +10,54 @@ public struct DeskView: View {
     public init(model: DeskModel) { self.model = model }
 
     public var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 0) {
             if showSettings || !model.isConfigured {
                 ScrollView {
                     SettingsPanel(model: model) { showSettings = false }
                 }
                 .scrollIndicators(.never)
                 .frame(height: 620)
+                .padding(16)
             } else {
-                header
-                hero
-                TasksTile(model: model)
-                MeetingsTile(model: model)
-                if let art = model.shownDay?.art { ArtTile(model: model, art: art) }
-                WeekStrip(model: model)
-                footer
+                HeroArt(model: model)
+                ArtCaption(model: model)
+                VStack(alignment: .leading, spacing: 22) {
+                    FocusLine(model: model)
+                    TasksSection(model: model)
+                    MeetingsSection(model: model)
+                    WeekStrip(model: model)
+                    footer
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 18)
+                .padding(.bottom, 14)
             }
         }
-        .padding(16)
         .frame(width: 380)
         .background(Theme.panel)
         .preferredColorScheme(.dark)
         .task { await model.refresh() }
     }
 
-    // MARK: Header
-
-    private var header: some View {
-        HStack(alignment: .center) {
-            Image(systemName: "photo.artframe")
-                .font(.system(size: 15))
-                .foregroundStyle(Theme.ink2)
-            VStack(alignment: .leading, spacing: 1) {
-                Text(model.dayTitle(model.shownDate, style: "EEEE"))
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(model.isShowingToday ? Theme.ink : Theme.champagne)
-                Text(model.dayTitle(model.shownDate, style: "MMMM d"))
-                    .font(.system(size: 12))
-                    .foregroundStyle(Theme.ink2)
-            }
-            Spacer()
-            RoundButton(symbol: "arrow.clockwise", spinning: model.isBusy) {
-                Task {
-                    await model.syncCalendar()
-                    await model.refresh()
-                }
-            }
-            .help("Sync now")
-        }
-    }
-
-    // MARK: Hero — the meeting that matters right now, like the big "23°C"
-
-    @ViewBuilder private var hero: some View {
-        let day = model.shownDay
-        VStack(alignment: .leading, spacing: 12) {
-            if model.isShowingToday, let lead = model.lead, let start = lead.event.start {
-                let end = lead.event.end ?? start
-                let mins = Int(((lead.inProgress ? end : start).timeIntervalSince(model.now) / 60).rounded(.up))
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text(lead.inProgress ? "\(mins)" : model.time(start))
-                        .font(.system(size: 54, weight: .light, design: .rounded))
-                        .monospacedDigit()
-                        .foregroundStyle(Theme.ink)
-                    Text(lead.inProgress ? "min left" : (mins <= 90 ? "in \(mins) min" : "next"))
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(Theme.ink2)
-                    Spacer()
-                }
-                Text(lead.event.title)
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(Theme.ink)
-                    .lineLimit(1)
-                ProgressTrack(fraction: progress(lead.inProgress, start: start, end: end))
-                if let focus = day?.focus {
-                    Text(focus).font(Theme.serif(15)).foregroundStyle(Theme.ink2).lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            } else {
-                Text(day?.focus ?? (model.week?.planned == false ? "No plan yet — say “plan my week” to Claude" : "A clear day"))
-                    .font(Theme.serif(day?.focus == nil ? 20 : 26))
-                    .foregroundStyle(day?.focus == nil ? Theme.ink2 : Theme.ink)
-                    .lineLimit(3)
-                    .fixedSize(horizontal: false, vertical: true) // wrap, don't truncate
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.vertical, 6)
-            }
-        }
-        .tile(padding: 18)
-    }
-
-    /// In a meeting: how much of it has passed. Before one: the last 90
-    /// minutes of waiting fill up like a slider.
-    private func progress(_ inProgress: Bool, start: Date, end: Date) -> Double {
-        if inProgress {
-            let total = end.timeIntervalSince(start)
-            return total > 0 ? model.now.timeIntervalSince(start) / total : 1
-        }
-        return 1 - min(1, max(0, start.timeIntervalSince(model.now) / (90 * 60)))
-    }
-
-    // MARK: Footer
-
     private var footer: some View {
         HStack(spacing: 8) {
             // A server problem outranks a calendar problem; both outrank "all good".
             let problem = model.error ?? (model.calendarSyncOn ? model.calendarStatus : nil)
             Image(systemName: problem == nil ? "checkmark.shield" : (model.error != nil ? "exclamationmark.triangle" : "calendar.badge.exclamationmark"))
-                .foregroundStyle(problem == nil ? Theme.ink2 : Color.orange)
+                .font(.system(size: 11))
+                .foregroundStyle(problem == nil ? Theme.ink3 : Color.orange)
             Text(problem ?? syncedText)
-                .font(.system(size: 12))
-                .foregroundStyle(problem == nil ? Theme.ink2 : Color.orange)
+                .font(.system(size: 11))
+                .foregroundStyle(problem == nil ? Theme.ink3 : Color.orange)
                 .lineLimit(1)
                 .help(problem ?? syncedText)
             Spacer()
             Button { showSettings = true } label: {
-                Image(systemName: "slider.horizontal.3").foregroundStyle(Theme.ink2)
+                Image(systemName: "slider.horizontal.3").font(.system(size: 12)).foregroundStyle(Theme.ink2)
             }
             .buttonStyle(.plain)
             .help("Settings")
         }
-        .padding(.horizontal, 4)
     }
 
     private var syncedText: String {
@@ -136,58 +65,262 @@ public struct DeskView: View {
         let f = DateFormatter()
         f.dateFormat = "h:mm"
         let cal = model.calendarSyncOn && model.week?.eventsSyncedAt != nil ? " · Calendar on" : ""
-        return "Connected · synced \(f.string(from: last))\(cal)"
+        return "Synced \(f.string(from: last))\(cal)"
     }
 }
 
-struct ProgressTrack: View {
-    let fraction: Double
+// MARK: - The painting, with the day set over it
+
+struct HeroArt: View {
+    @Bindable var model: DeskModel
+
     var body: some View {
-        GeometryReader { geo in
-            ZStack(alignment: .leading) {
-                Capsule().fill(Color.black.opacity(0.55))
-                    .overlay(Capsule().strokeBorder(Theme.stroke))
-                Capsule().fill(Theme.bar)
-                    .frame(width: max(28, geo.size.width * min(1, max(0, fraction))))
-                    .overlay(alignment: .trailing) {
-                        RoundedRectangle(cornerRadius: 7, style: .continuous)
-                            .fill(Theme.ink)
-                            .frame(width: 18, height: 26)
-                            .shadow(color: .black.opacity(0.4), radius: 3)
-                            .padding(.trailing, 4)
-                    }
+        let art = model.shownDay?.art
+        ZStack(alignment: .topLeading) {
+            // The painting, filling the frame; a quiet gradient until it loads.
+            AsyncImage(url: art.flatMap(model.artURL), transaction: .init(animation: .easeOut(duration: 0.6))) { phase in
+                if let image = phase.image {
+                    image.resizable().scaledToFill()
+                } else {
+                    LinearGradient(colors: [Theme.tileHi, Theme.panel], startPoint: .top, endPoint: .bottom)
+                }
             }
+            .frame(width: 380, height: 236)
+            .clipped()
+
+            // Legibility: a little shade at the top, more at the bottom.
+            LinearGradient(
+                stops: [
+                    .init(color: .black.opacity(0.55), location: 0),
+                    .init(color: .black.opacity(0), location: 0.32),
+                    .init(color: .black.opacity(0), location: 0.45),
+                    .init(color: .black.opacity(0.88), location: 1),
+                ],
+                startPoint: .top, endPoint: .bottom
+            )
+            .frame(width: 380, height: 236)
+
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(alignment: .firstTextBaseline) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text(model.dayTitle(model.shownDate, style: "EEEE"))
+                            .font(Theme.display(26))
+                            .foregroundStyle(model.isShowingToday ? .white : Theme.champagne)
+                        Text(model.dayTitle(model.shownDate, style: "MMMM d").uppercased())
+                            .font(Theme.label())
+                            .tracking(1.2)
+                            .foregroundStyle(.white.opacity(0.75))
+                    }
+                    Spacer()
+                    Button {
+                        Task {
+                            await model.syncCalendar()
+                            await model.refresh()
+                        }
+                    } label: {
+                        Image(systemName: "arrow.clockwise")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .rotationEffect(.degrees(model.isBusy ? 360 : 0))
+                            .animation(model.isBusy ? .linear(duration: 1).repeatForever(autoreverses: false) : .default, value: model.isBusy)
+                            .frame(width: 30, height: 30)
+                            .background(.ultraThinMaterial, in: Circle())
+                    }
+                    .buttonStyle(.plain)
+                    .help("Sync now")
+                }
+                Spacer()
+                NextUp(model: model)
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 16)
+            .padding(.bottom, 16)
+            .frame(width: 380, height: 236, alignment: .topLeading)
         }
-        .frame(height: 34)
-        .animation(.easeOut(duration: 0.6), value: fraction)
+        .frame(width: 380, height: 236)
+    }
+}
+
+/// Bottom of the hero: the meeting that matters now, set large.
+struct NextUp: View {
+    let model: DeskModel
+
+    var body: some View {
+        if model.isShowingToday, let lead = model.lead, let start = lead.event.start {
+            let end = lead.event.end ?? start
+            let mins = Int(((lead.inProgress ? end : start).timeIntervalSince(model.now) / 60).rounded(.up))
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(lead.inProgress ? "Now" : model.time(start))
+                        .font(Theme.display(48))
+                        .monospacedDigit()
+                    Text(lead.inProgress ? "\(mins) min left" : (mins <= 90 ? "in \(mins) min" : "next"))
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(Theme.champagne)
+                }
+                Text(lead.event.title)
+                    .font(.system(size: 14, weight: .semibold))
+                    .lineLimit(1)
+                Capsule()
+                    .fill(.white.opacity(0.18))
+                    .frame(height: 3)
+                    .overlay(alignment: .leading) {
+                        GeometryReader { geo in
+                            Capsule().fill(Theme.champagne)
+                                .frame(width: geo.size.width * progress(lead.inProgress, start: start, end: end))
+                        }
+                    }
+                    .padding(.top, 6)
+            }
+            .foregroundStyle(.white)
+        } else {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(model.isShowingToday ? model.time(model.now) : model.dayTitle(model.shownDate, style: "MMM d"))
+                    .font(Theme.display(48))
+                    .monospacedDigit()
+                Text(model.isShowingToday ? "Nothing else on the calendar" : "\(model.shownDay?.timed.count ?? 0) meetings")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.75))
+            }
+            .foregroundStyle(.white)
+        }
+    }
+
+    /// In a meeting: how much has passed. Before one: the last 90 minutes fill up.
+    private func progress(_ inProgress: Bool, start: Date, end: Date) -> Double {
+        let f: Double
+        if inProgress {
+            let total = end.timeIntervalSince(start)
+            f = total > 0 ? model.now.timeIntervalSince(start) / total : 1
+        } else {
+            f = 1 - start.timeIntervalSince(model.now) / (90 * 60)
+        }
+        return min(1, max(0.02, f))
+    }
+}
+
+/// The museum label, under the painting: title, artist, and the fact on demand.
+struct ArtCaption: View {
+    let model: DeskModel
+    @State private var open = false
+
+    var body: some View {
+        if let art = model.shownDay?.art {
+            VStack(alignment: .leading, spacing: 6) {
+                Button { withAnimation(.easeOut(duration: 0.2)) { open.toggle() } } label: {
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text(art.title)
+                            .font(Theme.serif(15))
+                            .foregroundStyle(Theme.ink)
+                            .lineLimit(1)
+                        Text("·").foregroundStyle(Theme.ink3)
+                        Text(art.artist)
+                            .font(.system(size: 11.5))
+                            .foregroundStyle(Theme.ink2)
+                            .lineLimit(1)
+                            .layoutPriority(1)
+                        Spacer(minLength: 4)
+                        if art.fact != nil {
+                            Image(systemName: open ? "chevron.up" : "info.circle")
+                                .font(.system(size: 11))
+                                .foregroundStyle(Theme.ink3)
+                        }
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(art.fact == nil)
+
+                if open, let fact = art.fact {
+                    Text(fact)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.ink2)
+                        .fixedSize(horizontal: false, vertical: true)
+                    HStack(spacing: 10) {
+                        if let date = art.date {
+                            Text(date).font(.system(size: 11)).foregroundStyle(Theme.ink3)
+                        }
+                        Spacer()
+                        if let s = art.factSource, let url = URL(string: s) {
+                            Link(destination: url) {
+                                Text(s.contains("wikipedia") ? "Wikipedia ↗" : "Museum ↗")
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundStyle(Theme.champagne)
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 10)
+            .background(Theme.tile)
+            .overlay(alignment: .bottom) { Rectangle().fill(Theme.stroke).frame(height: 1) }
+        }
+    }
+}
+
+// MARK: - Focus
+
+struct FocusLine: View {
+    let model: DeskModel
+
+    var body: some View {
+        let day = model.shownDay
+        HStack(alignment: .top, spacing: 12) {
+            Rectangle().fill(day?.focus == nil ? Theme.stroke : Theme.champagne).frame(width: 2)
+            Text(day?.focus ?? (model.week?.planned == false ? "No plan yet — say “plan my week” to Claude" : "A clear day"))
+                .font(Theme.serif(day?.focus == nil ? 19 : 23))
+                .foregroundStyle(day?.focus == nil ? Theme.ink3 : Theme.ink)
+                .lineSpacing(1)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .fixedSize(horizontal: false, vertical: true)
     }
 }
 
 // MARK: - Tasks
 
-struct TasksTile: View {
+struct TasksSection: View {
     @Bindable var model: DeskModel
     @State private var draft = ""
+    @State private var showAll = false
     @FocusState private var typing: Bool
+
+    /// Beyond this the popover would outgrow a laptop screen.
+    private let visible = 6
 
     var body: some View {
         let tasks = model.shownDay?.tasks ?? []
         let done = tasks.filter(\.done).count
-        VStack(alignment: .leading, spacing: 8) {
-            Kicker(text: "To do", trailing: tasks.isEmpty ? nil : "\(done) of \(tasks.count) done")
-            ForEach(Array(tasks.enumerated()), id: \.offset) { _, task in
+        VStack(alignment: .leading, spacing: 4) {
+            Kicker(text: "To do", trailing: tasks.isEmpty ? nil : "\(done) of \(tasks.count)")
+                .padding(.bottom, 4)
+            // Open first, finished sink — as on the TV.
+            let ordered = tasks.filter { !$0.done } + tasks.filter(\.done)
+            let shown = showAll ? ordered : Array(ordered.prefix(visible))
+            ForEach(Array(shown.enumerated()), id: \.offset) { _, task in
                 TaskRow(task: task,
                         toggle: { Task { await model.toggle(task) } },
                         remove: { Task { await model.remove(task) } })
             }
+            if ordered.count > visible {
+                Button(showAll ? "Show less" : "Show \(ordered.count - visible) more") {
+                    withAnimation(.easeOut(duration: 0.2)) { showAll.toggle() }
+                }
+                .buttonStyle(.plain)
+                .font(.system(size: 11.5, weight: .medium))
+                .foregroundStyle(Theme.champagne)
+                .padding(.leading, 28)
+                .padding(.vertical, 2)
+            }
             HStack(spacing: 10) {
                 Image(systemName: "plus")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(Theme.ink3)
-                    .frame(width: 20)
+                    .frame(width: 18)
                 TextField("Add a task", text: $draft)
                     .textFieldStyle(.plain)
-                    .font(.system(size: 13.5))
+                    .font(.system(size: 13))
                     .foregroundStyle(Theme.ink)
                     .focused($typing)
                     .onSubmit {
@@ -197,11 +330,11 @@ struct TasksTile: View {
                         typing = true
                     }
             }
-            .padding(.vertical, 6)
-            .padding(.horizontal, 8)
-            .background(Color.black.opacity(0.35), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .padding(.vertical, 7)
+            .overlay(alignment: .bottom) {
+                Rectangle().fill(typing ? Theme.champagne.opacity(0.6) : Theme.stroke).frame(height: 1)
+            }
         }
-        .tile()
     }
 }
 
@@ -215,17 +348,17 @@ struct TaskRow: View {
         HStack(spacing: 10) {
             Button(action: toggle) {
                 ZStack {
-                    Circle().strokeBorder(task.done ? Theme.champagne : Theme.ink3, lineWidth: 1.5)
+                    Circle().strokeBorder(task.done ? Theme.champagne.opacity(0.7) : Theme.ink3, lineWidth: 1.25)
                     if task.done {
-                        Circle().fill(Theme.champagne).padding(3.5)
+                        Image(systemName: "checkmark").font(.system(size: 8, weight: .bold)).foregroundStyle(Theme.champagne)
                     }
                 }
-                .frame(width: 20, height: 20)
+                .frame(width: 18, height: 18)
             }
             .buttonStyle(.plain)
 
             Text(task.text)
-                .font(.system(size: 13.5))
+                .font(.system(size: 13))
                 .strikethrough(task.done, color: Theme.ink3)
                 .foregroundStyle(task.done ? Theme.ink3 : Theme.ink)
                 .lineLimit(1)
@@ -235,55 +368,51 @@ struct TaskRow: View {
 
             if hover {
                 Button(action: remove) {
-                    Image(systemName: "xmark").font(.system(size: 10, weight: .bold)).foregroundStyle(Theme.ink2)
+                    Image(systemName: "xmark").font(.system(size: 9, weight: .bold)).foregroundStyle(Theme.ink2)
                 }
                 .buttonStyle(.plain)
                 .help("Remove")
             } else if let tag = task.tag {
-                Text(tag.uppercased()).font(Theme.label()).tracking(1).foregroundStyle(Theme.ink3)
+                Text(tag.uppercased()).font(.system(size: 9.5, weight: .semibold)).tracking(0.8).foregroundStyle(Theme.ink3)
             }
         }
-        .padding(.vertical, 3)
+        .padding(.vertical, 4)
         .onHover { hover = $0 }
     }
 }
 
 // MARK: - Meetings
 
-struct MeetingsTile: View {
+struct MeetingsSection: View {
     @Bindable var model: DeskModel
 
     var body: some View {
         let events = model.shownDay?.events ?? []
         let timed = events.filter { !$0.allDay }
         let allDay = events.filter(\.allDay)
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             Kicker(text: "Meetings", trailing: timed.isEmpty ? nil : "\(timed.count)")
+                .padding(.bottom, 2)
             if !allDay.isEmpty {
-                HStack(spacing: 6) {
-                    ForEach(allDay) { e in
-                        Text(e.title)
-                            .font(.system(size: 11.5))
-                            .foregroundStyle(Theme.ink2)
-                            .padding(.horizontal, 8).padding(.vertical, 3)
-                            .background(Capsule().fill(Theme.tileHi))
-                    }
-                }
+                Text(allDay.map(\.title).joined(separator: "  ·  "))
+                    .font(.system(size: 11.5))
+                    .foregroundStyle(Theme.ink3)
+                    .lineLimit(1)
             }
             if timed.isEmpty {
-                Text("No meetings").font(Theme.serif(14)).foregroundStyle(Theme.ink3)
+                Text("No meetings").font(Theme.serif(16)).foregroundStyle(Theme.ink3)
             }
             ForEach(timed) { e in
                 let isNow = model.isShowingToday && (e.start ?? .distantFuture) <= model.now && (e.end ?? .distantPast) > model.now
                 let past = model.isShowingToday && (e.end ?? .distantFuture) <= model.now
-                HStack(spacing: 10) {
+                HStack(alignment: .firstTextBaseline, spacing: 12) {
                     Text(model.time(e.start))
-                        .font(.system(size: 12.5, weight: isNow ? .semibold : .regular))
+                        .font(Theme.display(17))
                         .monospacedDigit()
                         .foregroundStyle(isNow ? Theme.champagne : Theme.ink2)
-                        .frame(width: 44, alignment: .leading)
+                        .frame(width: 42, alignment: .leading)
                     Text(e.title)
-                        .font(.system(size: 13.5, weight: isNow ? .semibold : .regular))
+                        .font(.system(size: 13, weight: isNow ? .semibold : .regular))
                         .foregroundStyle(Theme.ink)
                         .lineLimit(1)
                     Spacer(minLength: 0)
@@ -291,94 +420,48 @@ struct MeetingsTile: View {
                 .opacity(past ? 0.4 : 1)
             }
         }
-        .tile()
     }
 }
 
-// MARK: - Today's painting, as on the TV
-
-struct ArtTile: View {
-    let model: DeskModel
-    let art: DeskArt
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            AsyncImage(url: model.artURL(art)) { image in
-                image.resizable().scaledToFill()
-            } placeholder: {
-                Theme.tileHi
-            }
-            .frame(width: 64, height: 64)
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(Theme.stroke))
-
-            VStack(alignment: .leading, spacing: 3) {
-                Text(art.title)
-                    .font(Theme.serif(14.5))
-                    .foregroundStyle(Theme.ink)
-                    .lineLimit(1)
-                Text([art.artist, art.date].compactMap { $0 }.joined(separator: ", "))
-                    .font(.system(size: 11.5))
-                    .foregroundStyle(Theme.ink2)
-                    .lineLimit(1)
-                if let fact = art.fact {
-                    Text(fact)
-                        .font(.system(size: 11.5))
-                        .foregroundStyle(Theme.ink3)
-                        .lineLimit(3)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .padding(.top, 2)
-                }
-            }
-            Spacer(minLength: 0)
-            if let s = art.factSource, let url = URL(string: s) {
-                Link(destination: url) {
-                    Image(systemName: "arrow.up.right").font(.system(size: 10, weight: .semibold)).foregroundStyle(Theme.ink3)
-                }
-                .help("Read more on Wikipedia")
-            }
-        }
-        .tile(padding: 12)
-    }
-}
-
-// MARK: - Week, as four-by-two tiles in the reference; here seven slim ones
+// MARK: - Week
 
 struct WeekStrip: View {
     @Bindable var model: DeskModel
 
     var body: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 0) {
             ForEach(model.week?.days ?? []) { day in
                 let selected = day.date == model.shownDate
                 let isToday = day.date == model.todayYmd
                 Button {
                     model.selectedDate = isToday ? nil : day.date
                 } label: {
-                    VStack(spacing: 4) {
-                        Text(model.dayTitle(day.date, style: "EEE").uppercased())
-                            .font(.system(size: 9.5, weight: .semibold).width(.expanded))
+                    VStack(spacing: 3) {
+                        Text(model.dayTitle(day.date, style: "EEEEE"))
+                            .font(.system(size: 10, weight: .semibold))
                             .foregroundStyle(isToday ? Theme.champagne : Theme.ink3)
                         Text(model.dayTitle(day.date, style: "d"))
-                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .font(Theme.display(22))
                             .foregroundStyle(day.date < model.todayYmd ? Theme.ink3 : Theme.ink)
                         HStack(spacing: 2) {
                             ForEach(0 ..< min(day.timed.count, 3), id: \.self) { _ in
-                                Circle().fill(Theme.ink2).frame(width: 3.5, height: 3.5)
+                                Circle().fill(Theme.ink3).frame(width: 3, height: 3)
                             }
                         }
-                        .frame(height: 4)
+                        .frame(height: 3)
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 9)
-                    .background(selected ? Theme.tileHi : Theme.tile, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .strokeBorder(selected ? Theme.champagne.opacity(0.6) : Theme.stroke)
-                    )
+                    .padding(.vertical, 7)
+                    .background(selected ? Theme.tileHi : .clear, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .overlay(alignment: .top) {
+                        if isToday { Capsule().fill(Theme.champagne).frame(width: 14, height: 2) }
+                    }
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
             }
         }
+        .padding(.top, 2)
+        .overlay(alignment: .top) { Rectangle().fill(Theme.stroke).frame(height: 1).offset(y: -10) }
     }
 }
