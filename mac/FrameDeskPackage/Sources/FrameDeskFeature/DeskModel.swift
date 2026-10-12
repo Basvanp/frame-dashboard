@@ -42,7 +42,7 @@ public final class DeskModel {
 
     private var previewConfigured = false
 
-    var isConfigured: Bool { previewConfigured || api != nil }
+    public var isConfigured: Bool { previewConfigured || api != nil }
 
     private var api: DashboardAPI? {
         guard let url = URL(string: baseURL.trimmingCharacters(in: .whitespaces)),

@@ -78,12 +78,14 @@ public struct DeskView: View {
                 ProgressTrack(fraction: progress(lead.inProgress, start: start, end: end))
                 if let focus = day?.focus {
                     Text(focus).font(Theme.serif(15)).foregroundStyle(Theme.ink2).lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             } else {
                 Text(day?.focus ?? (model.week?.planned == false ? "No plan yet — say “plan my week” to Claude" : "A clear day"))
                     .font(Theme.serif(day?.focus == nil ? 20 : 26))
                     .foregroundStyle(day?.focus == nil ? Theme.ink2 : Theme.ink)
                     .lineLimit(3)
+                    .fixedSize(horizontal: false, vertical: true) // wrap, don't truncate
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical, 6)
             }
@@ -105,13 +107,15 @@ public struct DeskView: View {
 
     private var footer: some View {
         HStack(spacing: 8) {
-            let failing = model.error != nil
-            Image(systemName: failing ? "exclamationmark.triangle" : "checkmark.shield")
-                .foregroundStyle(failing ? Color.orange : Theme.ink2)
-            Text(failing ? (model.error ?? "") : syncedText)
+            // A server problem outranks a calendar problem; both outrank "all good".
+            let problem = model.error ?? (model.calendarSyncOn ? model.calendarStatus : nil)
+            Image(systemName: problem == nil ? "checkmark.shield" : (model.error != nil ? "exclamationmark.triangle" : "calendar.badge.exclamationmark"))
+                .foregroundStyle(problem == nil ? Theme.ink2 : Color.orange)
+            Text(problem ?? syncedText)
                 .font(.system(size: 12))
-                .foregroundStyle(Theme.ink2)
+                .foregroundStyle(problem == nil ? Theme.ink2 : Color.orange)
                 .lineLimit(1)
+                .help(problem ?? syncedText)
             Spacer()
             Button { showSettings = true } label: {
                 Image(systemName: "slider.horizontal.3").foregroundStyle(Theme.ink2)
@@ -126,7 +130,7 @@ public struct DeskView: View {
         guard let last = model.lastSync else { return "Connecting…" }
         let f = DateFormatter()
         f.dateFormat = "h:mm"
-        let cal = model.calendarSyncOn && model.calendarStatus == nil ? " · Calendar on" : ""
+        let cal = model.calendarSyncOn && model.week?.eventsSyncedAt != nil ? " · Calendar on" : ""
         return "Connected · synced \(f.string(from: last))\(cal)"
     }
 }
