@@ -15,7 +15,7 @@
   var VERSION_MS = 20 * 1000; // cheap "did anything change?" check
   var BROWSE_RESET_MS = 45 * 1000;
   var MAX_EVENTS = 4;
-  var MAX_TASKS = 4;
+  var MAX_TASKS = 14; // the layout trims to what actually fits, see fitTasks()
   var EVENING_FROM = 19; // the wall goes dark and the right side turns to tomorrow
   var NIGHT_UNTIL = 6; // after midnight it stays dark, but shows the new day
 
@@ -36,6 +36,7 @@
       inMin: 'in {m} min',
       fromToday: 'From today',
       noMeetings: 'No meetings',
+      doneForDay: 'No more meetings today',
       noTasks: 'Nothing planned',
       noFocus: 'No plan yet — plan the week with Claude',
       earlier: '{n} earlier',
@@ -64,6 +65,7 @@
       inMin: 'en {m} min',
       fromToday: 'De hoy',
       noMeetings: 'Sin juntas',
+      doneForDay: 'No hay más juntas hoy',
       noTasks: 'Nada planeado',
       noFocus: 'Sin plan todavía — planea la semana con Claude',
       earlier: '{n} antes',
@@ -408,15 +410,17 @@
       }
     }
 
-    // Keep what's ahead on screen; fold away the oldest past meetings first.
-    var shown = timed.slice();
-    var hidden = 0;
-    while (live && shown.length > MAX_EVENTS && Date.parse(shown[0].end) <= t0) {
-      shown.shift();
-      hidden++;
-    }
+    // What's over is over: past meetings leave the list (the header counts
+    // them), which frees rows for the to-dos.
+    var shown = live
+      ? timed.filter(function (e) {
+          return Date.parse(e.end) > t0;
+        })
+      : timed.slice();
+    var hidden = timed.length - shown.length;
+    if (hidden) $('schedule-count').textContent += ' · ' + t('earlier', { n: hidden });
+    if (!shown.length) list.appendChild(el('li', 'empty-line', t('doneForDay')));
     var overflow = Math.max(0, shown.length - MAX_EVENTS);
-    if (hidden) list.appendChild(el('li', 'more', t('earlier', { n: hidden })));
 
     shown.slice(0, MAX_EVENTS).forEach(function (e) {
       var s = Date.parse(e.start);
@@ -511,8 +515,7 @@
       else if (item.task.tag) li.appendChild(el('span', 'tag', item.task.tag));
       list.appendChild(li);
     });
-    // No "+N more" row here: the count in the header already says it, and the
-    // column has no room to spare.
+    fitTasks(list, all.length);
   }
 
   var MEDIUMS_ES = {
@@ -528,6 +531,25 @@
   function medium(m) {
     if (!m || lang() !== 'es') return m;
     return MEDIUMS_ES[m.toLowerCase()] || m;
+  }
+
+  // Show as many to-dos as the column has room for: drop rows from the end
+  // (finished ones sink there first) until nothing overflows, and say how
+  // many are hidden. Uses layout sizes, which the stage's scale() ignores.
+  function fitTasks(list, total) {
+    var day = $('day');
+    var fits = function () {
+      return day.scrollHeight <= day.clientHeight + 1;
+    };
+    if (fits()) return;
+    var more = el('li', 'more');
+    list.appendChild(more);
+    var rows = list.querySelectorAll('li:not(.more)');
+    for (var i = rows.length - 1; i >= 1; i--) {
+      list.removeChild(rows[i]);
+      more.textContent = t('more', { n: total - i });
+      if (fits()) return;
+    }
   }
 
   var WORDS = {

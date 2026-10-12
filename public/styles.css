@@ -306,6 +306,7 @@ ol {
   height: 940px;
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* app.js trims the to-do list to fit; never spill */
 }
 
 .eyebrow {
@@ -509,7 +510,7 @@ ol {
   display: flex;
   align-items: center;
   gap: 18px;
-  padding: 9px 0;
+  padding: 6px 0;
 }
 
 .tick {
@@ -588,8 +589,8 @@ ol {
 
 .status {
   position: absolute;
-  right: 0;
-  bottom: -40px;
+  right: 100px; /* the salon wall text's right edge */
+  top: 1044px;
   font-size: 13px;
   line-height: 18px;
   color: var(--faint);
@@ -885,7 +886,7 @@ ol {
 
 .bleed .tasks li {
   gap: 16px;
-  padding: 8px 0;
+  padding: 5px 0;
 }
 
 .bleed .tick {
@@ -922,7 +923,8 @@ ol {
 }
 
 .bleed .status {
-  bottom: -120px;
+  right: 136px; /* inside the placard */
+  top: 994px;
   color: var(--ink-2);
 }
 
