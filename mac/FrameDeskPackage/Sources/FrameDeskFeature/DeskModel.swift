@@ -13,6 +13,10 @@ public final class DeskModel {
     var lastSync: Date?
     var calendarStatus: String?
 
+    // Art packs (which collections the TV draws paintings from)
+    var artPacks: [ArtPack] = []
+    var enabledPacks: Set<String> = []
+
     // Settings
     var baseURL: String { didSet { UserDefaults.standard.set(baseURL, forKey: "baseURL") } }
     var calendarSyncOn: Bool { didSet { UserDefaults.standard.set(calendarSyncOn, forKey: "calendarSync") } }
@@ -166,6 +170,34 @@ public final class DeskModel {
         } catch {
             self.error = error.localizedDescription
             await refresh()
+        }
+    }
+
+    // MARK: Art packs
+
+    func loadArtPacks() async {
+        guard let api else { return }
+        do {
+            let s = try await api.artSettings()
+            artPacks = s.packs
+            enabledPacks = Set(s.enabled)
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
+    func setPack(_ id: String, on: Bool) async {
+        guard let api else { return }
+        var next = enabledPacks
+        if on { next.insert(id) } else { next.remove(id) }
+        guard !next.isEmpty else { return } // keep at least one
+        enabledPacks = next
+        do {
+            try await api.saveArtPacks(artPacks.map(\.id).filter(next.contains))
+            await refresh()
+        } catch {
+            self.error = error.localizedDescription
+            await loadArtPacks()
         }
     }
 

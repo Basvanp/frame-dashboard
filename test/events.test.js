@@ -39,3 +39,23 @@ test('the same meeting from iCal and from the Mac shows once', () => {
   ];
   assert.deepEqual(mergeEvents(a, b).map((e) => e.title), ['Standup', 'Dentist']);
 });
+
+import { artFor, listPacks } from '../lib/art.js';
+import { normalizeSettings } from '../lib/settings.js';
+
+test('art packs: every day gets a painting, remote ones carry a local fallback', () => {
+  const ids = listPacks().map((p) => p.id);
+  assert.ok(ids.includes('impressionists'));
+  for (let i = 0; i < 60; i++) {
+    const d = new Date(Date.UTC(2026, 9, 12 + i)).toISOString().slice(0, 10);
+    const a = artFor(d, ids);
+    assert.ok(a.image && a.title && a.ratio > 0);
+    if (!a.image.startsWith('art/')) assert.ok(a.fallback && a.fallback.image.startsWith('art/'));
+  }
+});
+
+test('settings reject unknown or empty pack lists', () => {
+  assert.throws(() => normalizeSettings({ packs: [] }), /at least one/);
+  assert.throws(() => normalizeSettings({ packs: ['nope'] }), /unknown/);
+  assert.deepEqual(normalizeSettings({ packs: ['impressionists', 'impressionists'] }).packs, ['impressionists']);
+});

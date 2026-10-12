@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
     "api/*.js": {
-      "includeFiles": "lib/art.json",
+      "includeFiles": "{lib/art.json,art/packs/*.json}",
       "maxDuration": 30
     }
   },
@@ -20,5 +20,29 @@
         }
       ]
     }
-  ]
+  ],
+  "images": {
+    "sizes": [
+      1280,
+      1920
+    ],
+    "remotePatterns": [
+      {
+        "protocol": "https",
+        "hostname": "openaccess-cdn.clevelandart.org"
+      },
+      {
+        "protocol": "https",
+        "hostname": "images.metmuseum.org"
+      },
+      {
+        "protocol": "https",
+        "hostname": "upload.wikimedia.org"
+      }
+    ],
+    "minimumCacheTTL": 2678400,
+    "formats": [
+      "image/webp"
+    ]
+  }
 }

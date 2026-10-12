@@ -74,6 +74,14 @@ struct DashboardAPI: Sendable {
         _ = try await request("api/plan", method: "PUT", body: try Self.encoder.encode(plan))
     }
 
+    func artSettings() async throws -> ArtSettings {
+        try Self.decoder.decode(ArtSettings.self, from: try await request("api/settings"))
+    }
+
+    func saveArtPacks(_ enabled: [String]) async throws {
+        _ = try await request("api/settings", method: "PUT", body: try Self.encoder.encode(["packs": enabled]))
+    }
+
     func save(_ events: EventsDoc) async throws {
         _ = try await request("api/events", method: "PUT", body: try Self.encoder.encode(events))
     }

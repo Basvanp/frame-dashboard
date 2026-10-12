@@ -355,6 +355,14 @@
         });
       });
     };
+    // A museum image that fails to load is replaced by a local painting,
+    // so the frame is never empty.
+    img.onerror = function () {
+      if (art.fallback && state.artShown === art.image) {
+        state.artShown = null;
+        hangArt(art.fallback);
+      }
+    };
     img.src = art.image;
   }
 

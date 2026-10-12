@@ -51,6 +51,29 @@ struct SettingsPanel: View {
             }
             .tile()
 
+            if !model.artPacks.isEmpty {
+                VStack(alignment: .leading, spacing: 10) {
+                    Kicker(text: "Art on the TV")
+                    ForEach(model.artPacks) { pack in
+                        Toggle(isOn: Binding(
+                            get: { model.enabledPacks.contains(pack.id) },
+                            set: { on in Task { await model.setPack(pack.id, on: on) } }
+                        )) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("\(pack.name) · \(pack.count)").font(.system(size: 13)).foregroundStyle(Theme.ink)
+                                if let d = pack.description {
+                                    Text(d).font(.system(size: 11)).foregroundStyle(Theme.ink3).lineLimit(2)
+                                }
+                            }
+                        }
+                        .toggleStyle(.switch)
+                        .tint(Theme.champagne)
+                        .disabled(model.enabledPacks == [pack.id])
+                    }
+                }
+                .tile()
+            }
+
             Toggle(isOn: $openAtLogin) {
                 Text("Open at login").font(.system(size: 13)).foregroundStyle(Theme.ink)
             }
@@ -96,6 +119,7 @@ struct SettingsPanel: View {
             }
         }
         .onAppear { url = model.baseURL }
+        .task { await model.loadArtPacks() }
     }
 
     private func field(_ placeholder: String, text: Binding<String>) -> some View {

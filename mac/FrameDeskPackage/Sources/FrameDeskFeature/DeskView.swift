@@ -10,7 +10,11 @@ public struct DeskView: View {
     public var body: some View {
         VStack(spacing: 12) {
             if showSettings || !model.isConfigured {
-                SettingsPanel(model: model) { showSettings = false }
+                ScrollView {
+                    SettingsPanel(model: model) { showSettings = false }
+                }
+                .scrollIndicators(.never)
+                .frame(height: 620)
             } else {
                 header
                 hero

@@ -86,3 +86,15 @@ struct EventsDoc: Codable, Sendable {
     var source: String
     var events: [Event]
 }
+
+public struct ArtPack: Codable, Hashable, Sendable, Identifiable {
+    public var id: String
+    public var name: String
+    public var description: String?
+    public var count: Int
+}
+
+struct ArtSettings: Codable, Sendable {
+    var packs: [ArtPack]
+    var enabled: [String]
+}
