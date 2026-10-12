@@ -171,6 +171,26 @@ comes back after boot, and refreshes every few hours to pick up new deploys.
 
 ## Art
 
+Paintings come in **packs**, switched on and off in Frame Desk's Settings:
+
+| Pack | Works | Source |
+|---|---|---|
+| Impressionists | 44 | Wikimedia Commons scans, self-hosted in `public/art/` |
+| Japanese prints | 39 | Cleveland Museum of Art (CC0) |
+| Cleveland highlights | 36 | Cleveland Museum of Art (CC0) |
+| The Met: landscapes | 23 | The Metropolitan Museum of Art (CC0) |
+
+Museum packs live in `art/packs/*.json` and are built by
+`node scripts/build-packs.mjs`. Read the titles it prints before committing,
+because automatic queries let sketches, nudes and near-duplicates through.
+Their images reach the TV through Vercel's image optimizer on your own domain
+(allowed hosts in `vercel.json`). If one fails, the TV hangs a self-hosted
+painting instead.
+
+Facts: Cleveland works use the curators' "Did you know" (CC0). The
+Impressionists use one sentence from Wikipedia (`art/facts.json`, CC BY-SA,
+credited on screen).
+
 Every work is in the public domain. The images are scans from
 [Wikimedia Commons](https://commons.wikimedia.org/), resized and served from
 `public/art/` with the app. Museum image servers sit behind bot protection
