@@ -64,8 +64,10 @@ Preview variants with `?mode=night`, `?at=21:00` (pretend it's that time),
 
 ## Deploy (Vercel)
 
-1. `vercel link`, then add the **Upstash for Redis** integration from the
-   Vercel marketplace. It sets `KV_REST_API_URL` / `KV_REST_API_TOKEN`.
+1. `vercel link`, then in the dashboard: *Storage → Create Database →
+   Upstash for Redis* (the Free plan is plenty) and connect it to the project
+   with the prefix **`KV`**, so it sets `KV_REST_API_URL` / `KV_REST_API_TOKEN`.
+   (`vercel integration add upstash` can't select the Redis product as of CLI 48.)
 2. Set the environment variables listed in `.env.example`:
    - `ICS_URLS`: in Google Calendar go to *Settings → your calendar →
      Integrate calendar → Secret address in iCal format*. You can list
