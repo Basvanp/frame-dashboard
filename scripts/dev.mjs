@@ -6,6 +6,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import week from '../api/week.js';
 import plan from '../api/plan.js';
+import events from '../api/events.js';
 
 const PORT = Number(process.env.PORT || 4321);
 const ROOT = path.join(process.cwd(), 'public');
@@ -19,7 +20,7 @@ const TYPES = {
   '.woff2': 'font/woff2',
 };
 
-const routes = { '/api/week': week, '/api/plan': plan };
+const routes = { '/api/week': week, '/api/plan': plan, '/api/events': events };
 
 http
   .createServer(async (req, res) => {
