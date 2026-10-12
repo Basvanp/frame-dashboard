@@ -11,7 +11,8 @@
 (function () {
   'use strict';
 
-  var REFRESH_MS = 5 * 60 * 1000;
+  var REFRESH_MS = 5 * 60 * 1000; // full rebuild: picks up calendar-feed changes
+  var VERSION_MS = 20 * 1000; // cheap "did anything change?" check
   var BROWSE_RESET_MS = 45 * 1000;
   var MAX_EVENTS = 4;
   var MAX_TASKS = 4;
@@ -85,6 +86,7 @@
     browseTimer: null,
     artShown: null,
     lastLoad: 0,
+    version: null,
     skew: 0, // server clock minus TV clock; TVs drift, the server doesn't
   };
 
@@ -706,6 +708,24 @@
       });
   }
 
+  // Edits from the Mac app or Claude bump a version on the server. Poll it
+  // often (one tiny request) and reload the week only when it moves.
+  function checkVersion() {
+    var key = readKey();
+    fetch('api/version' + (key ? '?k=' + encodeURIComponent(key) : ''), { cache: 'no-store' })
+      .then(function (res) {
+        return res.ok ? res.json() : null;
+      })
+      .then(function (body) {
+        if (!body) return;
+        if (state.version !== null && body.version !== state.version) load();
+        state.version = body.version;
+      })
+      .catch(function () {
+        /* offline: the next full refresh will notice */
+      });
+  }
+
   // ── Remote: ←/→ browse the week, OK/↑/↓ back to today ────────────────
 
   function browse(step) {
@@ -751,5 +771,7 @@
   render();
   load();
   setInterval(load, REFRESH_MS);
+  checkVersion();
+  setInterval(checkVersion, VERSION_MS);
   setInterval(render, 20 * 1000);
 })();
