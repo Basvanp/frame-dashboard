@@ -16,3 +16,4 @@ tizen/dashboard-url.js
 .DS_Store
 android/dashboard.properties
 assets/mockup/
+.env*.local
