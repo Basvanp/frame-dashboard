@@ -21,8 +21,12 @@ enum Theme {
     /// Instrument Serif, the TV's display face: clock, dates, titles.
     static func display(_ size: CGFloat) -> Font { .custom("InstrumentSerif-Regular", size: size) }
     static func serif(_ size: CGFloat) -> Font { .custom("InstrumentSerif-Italic", size: size) }
-    /// Small caps labels: system font, a touch of tracking, never wide.
-    static func label() -> Font { .system(size: 10.5, weight: .semibold) }
+    /// Geist, the TV's text face: tasks, labels, status.
+    static func text(_ size: CGFloat, _ weight: Font.Weight = .regular) -> Font {
+        .custom("Geist", size: size).weight(weight)
+    }
+    /// Small caps labels: a touch of tracking, never wide.
+    static func label() -> Font { text(10.5, .semibold) }
 }
 
 struct TileStyle: ViewModifier {
@@ -47,7 +51,7 @@ struct Kicker: View {
         HStack {
             Text(text.uppercased()).font(Theme.label()).tracking(0.9).foregroundStyle(Theme.ink3)
             Spacer()
-            if let trailing { Text(trailing).font(.system(size: 11)).foregroundStyle(Theme.ink3) }
+            if let trailing { Text(trailing).font(Theme.text(11)).foregroundStyle(Theme.ink3) }
         }
     }
 }
@@ -62,7 +66,7 @@ struct RoundButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: symbol)
-                .font(.system(size: 14, weight: .medium))
+                .font(Theme.text(14, .medium))
                 .foregroundStyle(hover ? Theme.ink : Theme.ink2)
                 .rotationEffect(.degrees(spinning ? 360 : 0))
                 .animation(spinning ? .linear(duration: 1).repeatForever(autoreverses: false) : .default, value: spinning)

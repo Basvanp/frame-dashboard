@@ -14,7 +14,7 @@ struct SettingsPanel: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Text("Settings").font(.system(size: 17, weight: .semibold)).foregroundStyle(Theme.ink)
+                Text("Settings").font(Theme.text(17, .semibold)).foregroundStyle(Theme.ink)
                 Spacer()
                 if model.isConfigured {
                     RoundButton(symbol: "xmark", action: done)
@@ -26,11 +26,11 @@ struct SettingsPanel: View {
                 field("https://your-dashboard.vercel.app", text: $url)
                 SecureField(model.hasKey ? "Key saved — paste a new one to replace" : "Write key (DASHBOARD_WRITE_KEY)", text: $key)
                     .textFieldStyle(.plain)
-                    .font(.system(size: 13))
+                    .font(Theme.text(13))
                     .padding(10)
                     .background(Color.black.opacity(0.35), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                 Text("The key is stored in your Keychain.")
-                    .font(.system(size: 11)).foregroundStyle(Theme.ink3)
+                    .font(Theme.text(11)).foregroundStyle(Theme.ink3)
             }
             .tile()
 
@@ -38,15 +38,15 @@ struct SettingsPanel: View {
                 Kicker(text: "Calendar")
                 Toggle(isOn: $model.calendarSyncOn) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Send this Mac's meetings to the TV").font(.system(size: 13)).foregroundStyle(Theme.ink)
+                        Text("Send this Mac's meetings to the TV").font(Theme.text(13)).foregroundStyle(Theme.ink)
                         Text("Reads every calendar in Calendar.app, skipping birthdays and subscriptions.")
-                            .font(.system(size: 11)).foregroundStyle(Theme.ink3)
+                            .font(Theme.text(11)).foregroundStyle(Theme.ink3)
                     }
                 }
                 .toggleStyle(.switch)
                 .tint(Theme.champagne)
                 if let status = model.calendarStatus {
-                    Text(status).font(.system(size: 11)).foregroundStyle(.orange)
+                    Text(status).font(Theme.text(11)).foregroundStyle(.orange)
                 }
             }
             .tile()
@@ -60,9 +60,9 @@ struct SettingsPanel: View {
                             set: { on in Task { await model.setPack(pack.id, on: on) } }
                         )) {
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("\(pack.name) · \(pack.count)").font(.system(size: 13)).foregroundStyle(Theme.ink)
+                                Text("\(pack.name) · \(pack.count)").font(Theme.text(13)).foregroundStyle(Theme.ink)
                                 if let d = pack.description {
-                                    Text(d).font(.system(size: 11)).foregroundStyle(Theme.ink3).lineLimit(2)
+                                    Text(d).font(Theme.text(11)).foregroundStyle(Theme.ink3).lineLimit(2)
                                 }
                             }
                         }
@@ -75,7 +75,7 @@ struct SettingsPanel: View {
             }
 
             Toggle(isOn: $openAtLogin) {
-                Text("Open at login").font(.system(size: 13)).foregroundStyle(Theme.ink)
+                Text("Open at login").font(Theme.text(13)).foregroundStyle(Theme.ink)
             }
             .toggleStyle(.switch)
             .tint(Theme.champagne)
@@ -90,13 +90,13 @@ struct SettingsPanel: View {
             }
 
             if let error = model.error {
-                Text(error).font(.system(size: 12)).foregroundStyle(.orange)
+                Text(error).font(Theme.text(12)).foregroundStyle(.orange)
             }
 
             HStack {
                 Button("Quit Frame Desk") { NSApp.terminate(nil) }
                     .buttonStyle(.plain)
-                    .font(.system(size: 12))
+                    .font(Theme.text(12))
                     .foregroundStyle(Theme.ink3)
                 Spacer()
                 Button {
@@ -109,7 +109,7 @@ struct SettingsPanel: View {
                     }
                 } label: {
                     Text(saving ? "Connecting…" : "Save")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(Theme.text(13, .semibold))
                         .foregroundStyle(Color.black)
                         .padding(.horizontal, 18).padding(.vertical, 8)
                         .background(Capsule().fill(Theme.champagne))
@@ -125,7 +125,7 @@ struct SettingsPanel: View {
     private func field(_ placeholder: String, text: Binding<String>) -> some View {
         TextField(placeholder, text: text)
             .textFieldStyle(.plain)
-            .font(.system(size: 13))
+            .font(Theme.text(13))
             .padding(10)
             .background(Color.black.opacity(0.35), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
     }

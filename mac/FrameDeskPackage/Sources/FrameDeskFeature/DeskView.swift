@@ -44,16 +44,16 @@ public struct DeskView: View {
             // A server problem outranks a calendar problem; both outrank "all good".
             let problem = model.error ?? (model.calendarSyncOn ? model.calendarStatus : nil)
             Image(systemName: problem == nil ? "checkmark.shield" : (model.error != nil ? "exclamationmark.triangle" : "calendar.badge.exclamationmark"))
-                .font(.system(size: 11))
+                .font(Theme.text(11))
                 .foregroundStyle(problem == nil ? Theme.ink3 : Color.orange)
             Text(problem ?? syncedText)
-                .font(.system(size: 11))
+                .font(Theme.text(11))
                 .foregroundStyle(problem == nil ? Theme.ink3 : Color.orange)
                 .lineLimit(1)
                 .help(problem ?? syncedText)
             Spacer()
             Button { showSettings = true } label: {
-                Image(systemName: "slider.horizontal.3").font(.system(size: 12)).foregroundStyle(Theme.ink2)
+                Image(systemName: "slider.horizontal.3").font(Theme.text(12)).foregroundStyle(Theme.ink2)
             }
             .buttonStyle(.plain)
             .help("Settings")
@@ -119,7 +119,7 @@ struct HeroArt: View {
                         }
                     } label: {
                         Image(systemName: "arrow.clockwise")
-                            .font(.system(size: 12, weight: .semibold))
+                            .font(Theme.text(12, .semibold))
                             .foregroundStyle(.white)
                             .rotationEffect(.degrees(model.isBusy ? 360 : 0))
                             .animation(model.isBusy ? .linear(duration: 1).repeatForever(autoreverses: false) : .default, value: model.isBusy)
@@ -155,11 +155,11 @@ struct NextUp: View {
                         .font(Theme.display(48))
                         .monospacedDigit()
                     Text(lead.inProgress ? "\(mins) min left" : (mins <= 90 ? "in \(mins) min" : "next"))
-                        .font(.system(size: 13, weight: .medium))
+                        .font(Theme.text(13, .medium))
                         .foregroundStyle(Theme.champagne)
                 }
                 Text(lead.event.title)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(Theme.text(14, .semibold))
                     .lineLimit(1)
                 Capsule()
                     .fill(.white.opacity(0.18))
@@ -179,7 +179,7 @@ struct NextUp: View {
                     .font(Theme.display(48))
                     .monospacedDigit()
                 Text(model.isShowingToday ? "Nothing else on the calendar" : "\(model.shownDay?.timed.count ?? 0) meetings")
-                    .font(.system(size: 13, weight: .medium))
+                    .font(Theme.text(13, .medium))
                     .foregroundStyle(.white.opacity(0.75))
             }
             .foregroundStyle(.white)
@@ -215,14 +215,14 @@ struct ArtCaption: View {
                             .lineLimit(1)
                         Text("·").foregroundStyle(Theme.ink3)
                         Text(art.artist)
-                            .font(.system(size: 11.5))
+                            .font(Theme.text(11.5))
                             .foregroundStyle(Theme.ink2)
                             .lineLimit(1)
                             .layoutPriority(1)
                         Spacer(minLength: 4)
                         if art.fact != nil {
                             Image(systemName: open ? "chevron.up" : "info.circle")
-                                .font(.system(size: 11))
+                                .font(Theme.text(11))
                                 .foregroundStyle(Theme.ink3)
                         }
                     }
@@ -233,18 +233,18 @@ struct ArtCaption: View {
 
                 if open, let fact = art.fact {
                     Text(fact)
-                        .font(.system(size: 12))
+                        .font(Theme.text(12))
                         .foregroundStyle(Theme.ink2)
                         .fixedSize(horizontal: false, vertical: true)
                     HStack(spacing: 10) {
                         if let date = art.date {
-                            Text(date).font(.system(size: 11)).foregroundStyle(Theme.ink3)
+                            Text(date).font(Theme.text(11)).foregroundStyle(Theme.ink3)
                         }
                         Spacer()
                         if let s = art.factSource, let url = URL(string: s) {
                             Link(destination: url) {
                                 Text(s.contains("wikipedia") ? "Wikipedia ↗" : "Museum ↗")
-                                    .font(.system(size: 11, weight: .medium))
+                                    .font(Theme.text(11, .medium))
                                     .foregroundStyle(Theme.champagne)
                             }
                         }
@@ -308,19 +308,19 @@ struct TasksSection: View {
                     withAnimation(.easeOut(duration: 0.2)) { showAll.toggle() }
                 }
                 .buttonStyle(.plain)
-                .font(.system(size: 11.5, weight: .medium))
+                .font(Theme.text(11.5, .medium))
                 .foregroundStyle(Theme.champagne)
                 .padding(.leading, 28)
                 .padding(.vertical, 2)
             }
             HStack(spacing: 10) {
                 Image(systemName: "plus")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(Theme.text(11, .semibold))
                     .foregroundStyle(Theme.ink3)
                     .frame(width: 18)
                 TextField("Add a task", text: $draft)
                     .textFieldStyle(.plain)
-                    .font(.system(size: 13))
+                    .font(Theme.text(13))
                     .foregroundStyle(Theme.ink)
                     .focused($typing)
                     .onSubmit {
@@ -348,17 +348,22 @@ struct TaskRow: View {
         HStack(spacing: 10) {
             Button(action: toggle) {
                 ZStack {
-                    Circle().strokeBorder(task.done ? Theme.champagne.opacity(0.7) : Theme.ink3, lineWidth: 1.25)
+                    Circle().strokeBorder(task.done ? Theme.champagne.opacity(0.7) : (hover ? Theme.ink2 : Theme.ink3), lineWidth: 1.25)
                     if task.done {
                         Image(systemName: "checkmark").font(.system(size: 8, weight: .bold)).foregroundStyle(Theme.champagne)
                     }
                 }
                 .frame(width: 18, height: 18)
+                // A ring is only its stroke to hit-testing; make the whole
+                // circle, and a margin around it, clickable.
+                .frame(width: 28, height: 28)
+                .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .help(task.done ? "Mark as not done" : "Mark as done")
 
             Text(task.text)
-                .font(.system(size: 13))
+                .font(Theme.text(13))
                 .strikethrough(task.done, color: Theme.ink3)
                 .foregroundStyle(task.done ? Theme.ink3 : Theme.ink)
                 .lineLimit(1)
@@ -368,15 +373,15 @@ struct TaskRow: View {
 
             if hover {
                 Button(action: remove) {
-                    Image(systemName: "xmark").font(.system(size: 9, weight: .bold)).foregroundStyle(Theme.ink2)
+                    Image(systemName: "xmark").font(Theme.text(9, .bold)).foregroundStyle(Theme.ink2)
                 }
                 .buttonStyle(.plain)
                 .help("Remove")
             } else if let tag = task.tag {
-                Text(tag.uppercased()).font(.system(size: 9.5, weight: .semibold)).tracking(0.8).foregroundStyle(Theme.ink3)
+                Text(tag.uppercased()).font(Theme.text(9.5, .semibold)).tracking(0.8).foregroundStyle(Theme.ink3)
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 1)
         .onHover { hover = $0 }
     }
 }
@@ -395,7 +400,7 @@ struct MeetingsSection: View {
                 .padding(.bottom, 2)
             if !allDay.isEmpty {
                 Text(allDay.map(\.title).joined(separator: "  ·  "))
-                    .font(.system(size: 11.5))
+                    .font(Theme.text(11.5))
                     .foregroundStyle(Theme.ink3)
                     .lineLimit(1)
             }
@@ -412,7 +417,7 @@ struct MeetingsSection: View {
                         .foregroundStyle(isNow ? Theme.champagne : Theme.ink2)
                         .frame(width: 42, alignment: .leading)
                     Text(e.title)
-                        .font(.system(size: 13, weight: isNow ? .semibold : .regular))
+                        .font(Theme.text(13, isNow ? .semibold : .regular))
                         .foregroundStyle(Theme.ink)
                         .lineLimit(1)
                     Spacer(minLength: 0)
@@ -438,7 +443,7 @@ struct WeekStrip: View {
                 } label: {
                     VStack(spacing: 3) {
                         Text(model.dayTitle(day.date, style: "EEEEE"))
-                            .font(.system(size: 10, weight: .semibold))
+                            .font(Theme.text(10, .semibold))
                             .foregroundStyle(isToday ? Theme.champagne : Theme.ink3)
                         Text(model.dayTitle(day.date, style: "d"))
                             .font(Theme.display(22))
