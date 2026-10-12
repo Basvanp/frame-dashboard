@@ -22,7 +22,7 @@ case "${1:-}" in
     echo "Built tizen/FrameDashboard.wgt"
     ;;
   install)
-    : "${TV_IP:?set TV_IP to the TV's address}"
+    : "${TV_IP:?set TV_IP to the address of the TV}"
     "$SDB" connect "$TV_IP:26101"
     TARGET=$("$SDB" devices | awk 'NR>1 && $1 ~ /:26101$/ {print $3; exit}')
     "$TIZEN" install -n FrameDashboard.wgt -t "$TARGET" -- tizen

@@ -122,7 +122,7 @@ or later should work.
 
 ```bash
 npm run tizen:build                       # writes tizen/FrameDashboard.wgt
-TV_IP=192.168.1.50 npm run tizen:install
+TV_IP=192.168.1.50 npm run tizen:install   # TIZEN_PROFILE=<name> if your profile isn't "frame"
 ```
 
 "Frame Dashboard" then shows up in the TV's app row. Samsung apps can't start
