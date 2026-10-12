@@ -1,0 +1,23 @@
+{
+  "name": "frame-dashboard",
+  "version": "0.1.0",
+  "description": "A daily dashboard for the Samsung Frame (Tizen) and Android TV. Plan the week on Monday, see each day on the wall.",
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env.local scripts/dev.mjs",
+    "test": "node --test test/*.test.js",
+    "plan:push": "node --env-file-if-exists=.env.local scripts/push-plan.mjs",
+    "shell:config": "node --env-file-if-exists=.env.local scripts/shell-config.mjs",
+    "android:build": "npm run shell:config && cd android && ./gradlew assembleRelease",
+    "tizen:build": "npm run shell:config && sh scripts/tizen.sh build",
+    "tizen:install": "sh scripts/tizen.sh install"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "ical-expander": "^3.2.0"
+  },
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  }
+}

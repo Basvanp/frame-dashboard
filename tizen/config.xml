@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Samsung TV (Tizen) shell. It is a frame around the hosted dashboard: an
+  iframe pointed at DASHBOARD_URL, plus the two things only a TV app can do —
+  keep the screensaver off and exit on the Back key.
+
+  The package id must be 10 alphanumeric characters. Change both ids if you
+  fork this and install it next to the original.
+-->
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets"
+        id="http://frame-dashboard.local/tizen" version="0.1.0" viewmodes="maximized">
+  <tizen:application id="FrmDashbd1.FrameDashboard" package="FrmDashbd1" required_version="3.0"/>
+  <tizen:profile name="tv-samsung"/>
+  <content src="index.html"/>
+  <icon src="icon.png"/>
+  <name>Frame Dashboard</name>
+  <feature name="http://tizen.org/feature/screen.size.all"/>
+  <access origin="*" subdomains="true"/>
+  <tizen:privilege name="http://tizen.org/privilege/internet"/>
+  <tizen:privilege name="http://tizen.org/privilege/tv.inputdevice"/>
+  <tizen:setting screen-orientation="landscape" context-menu="disable" background-support="disable"
+                 encryption="disable" install-location="auto" hwkey-event="enable"/>
+</widget>

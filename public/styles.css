@@ -1,0 +1,965 @@
+/*
+ * The salon — a 19th-century picture gallery: painted green-grey walls, gilt
+ * frames, a brass picture lamp, bone label cards. Every colour is one of those
+ * objects. Design source: the "Frame App" Paper file (Salon — Day / Night).
+ *
+ * Targets the browser in a 2022 Samsung Frame (Tizen 6.5, about Chromium 85)
+ * and old Android TV WebViews: no `inset`, `aspect-ratio`, `:has()`, container
+ * queries or nesting. Flex `gap` is fine from Chromium 84.
+ */
+
+:root {
+  --serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --sans: 'Geist', 'SamsungOne', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Day: the wall under daylight. */
+  --bone: #ece6d8; /* label card, primary text */
+  --lichen: #b3b8ad; /* secondary text */
+  --faint: #7e877d; /* finished, weekend */
+  --gilt: #c8a45c; /* frame, "now", today */
+  --rule: rgba(236, 230, 216, 0.16);
+  --rule-soft: rgba(236, 230, 216, 0.1);
+  --card: #ece6d8;
+  --card-ink: #1e1a14;
+  --card-ink-2: #5a544a;
+  --mat: #e6dfcf;
+  --glow: rgba(255, 228, 176, 0.2);
+}
+
+.night {
+  /* Night: the room lights are off; only the picture lamp is on. */
+  --bone: #dcd5c6;
+  --card: #cec6b4;
+  --mat: #d3cbb9;
+  --glow: rgba(255, 210, 140, 0.24);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #111613;
+  color: var(--bone);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  transform-origin: 0 0;
+}
+
+/* Gradients can't transition, so day and night are two walls that crossfade. */
+.wall {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 3s var(--ease);
+}
+
+.wall-day {
+  background: #2e3b36 radial-gradient(ellipse 62% 78% at 30% 42%, #3b4b44 0%, #2e3b36 52%, #1f2824 100%);
+}
+
+.wall-night {
+  background: #161d1a radial-gradient(ellipse 58% 74% at 30% 42%, #26332d 0%, #161d1a 50%, #0c100e 100%);
+  opacity: 0;
+}
+
+.night .wall-night {
+  opacity: 1;
+}
+
+/* ── The painting ─────────────────────────────────────────── */
+
+.art {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1080px;
+  height: 880px;
+  opacity: 0;
+  transition: opacity 1.6s var(--ease);
+}
+
+.art.is-in {
+  opacity: 1;
+}
+
+.glow {
+  position: absolute;
+  width: 920px;
+  height: 760px;
+  background: radial-gradient(ellipse 44% 42% at 50% 42%, var(--glow) 0%, rgba(255, 220, 160, 0.05) 55%, rgba(255, 220, 160, 0) 100%);
+  transition: background 3s var(--ease);
+}
+
+.lamp {
+  position: absolute;
+  width: 260px;
+  height: 30px;
+}
+
+.lamp i {
+  display: block;
+  width: 260px;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #e2c487 0%, #b08a45 55%, #7a5c27 100%);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.lamp b {
+  display: block;
+  width: 4px;
+  height: 18px;
+  margin: 0 auto;
+  background: #8a6a32;
+}
+
+.frame {
+  position: absolute;
+  padding: 16px;
+  background: linear-gradient(135deg, #dcbe7e 0%, #b8914a 38%, #8e6c2e 62%, #c9a55f 100%);
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.35), 0 40px 70px -24px rgba(0, 0, 0, 0.7);
+}
+
+.liner {
+  width: 100%;
+  height: 100%;
+  padding: 5px;
+  background: #120e09;
+}
+
+/* Works on paper get a black frame and a mat, the way a print is hung. */
+.frame.paper {
+  padding: 14px;
+  background: #15110c;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.5), 0 44px 80px -24px rgba(0, 0, 0, 0.85);
+}
+
+.frame.paper .liner {
+  padding: 48px;
+  background: var(--mat);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: background-color 3s var(--ease);
+}
+
+.painting {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #2a2a24;
+  transition: opacity 3s var(--ease);
+}
+
+.night .painting {
+  opacity: 0.92;
+}
+
+/* ── Label card and week, on the shelf under the painting ─────── */
+
+.label {
+  position: absolute;
+  left: 126px;
+  top: 902px;
+  width: 380px;
+  padding: 20px 24px 18px;
+  background: var(--card);
+  color: var(--card-ink);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 22px -10px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 1.6s var(--ease) 0.3s, background-color 3s var(--ease);
+}
+
+.label.is-in {
+  opacity: 1;
+}
+
+.label-artist {
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 22px;
+}
+
+.label-title {
+  margin-top: 4px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 24px;
+  line-height: 28px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.label-meta {
+  margin-top: 10px;
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--card-ink-2);
+}
+
+.week {
+  position: absolute;
+  left: 546px;
+  top: 902px;
+  width: 468px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.week li {
+  width: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 2px solid var(--rule);
+}
+
+.wk-day {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 18px;
+  letter-spacing: 0.18em;
+  color: var(--lichen);
+}
+
+.wk-num {
+  margin-top: 4px;
+  font-family: var(--serif);
+  font-size: 38px;
+  line-height: 40px;
+}
+
+.wk-dots {
+  display: flex;
+  gap: 4px;
+  height: 6px;
+  margin-top: 4px;
+}
+
+.wk-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--lichen);
+}
+
+.week .is-weekend .wk-day,
+.week .is-weekend .wk-num {
+  color: var(--faint);
+}
+
+.week .is-past {
+  opacity: 0.55;
+}
+
+.week .is-today,
+.week .is-selected {
+  border-top-color: var(--gilt);
+}
+
+.week .is-today .wk-day,
+.week .is-selected .wk-day {
+  color: var(--gilt);
+}
+
+.week .is-today .wk-dots i {
+  background: var(--bone);
+}
+
+/* ── The day, as wall text ────────────────────────────────── */
+
+.day {
+  position: absolute;
+  left: 1124px;
+  top: 84px;
+  width: 696px;
+  height: 940px;
+  display: flex;
+  flex-direction: column;
+}
+
+.eyebrow {
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 24px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--lichen);
+}
+
+.browsing .eyebrow {
+  color: var(--gilt);
+}
+
+.clock {
+  display: flex;
+  align-items: flex-start;
+  padding-top: 6px;
+  font-family: var(--serif);
+  font-size: 200px;
+  line-height: 176px;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+}
+
+.period {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 28px;
+  letter-spacing: 0.14em;
+  color: var(--lichen);
+  padding: 22px 0 0 14px;
+}
+
+.kicker {
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 20px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--lichen);
+}
+
+.kicker.accent {
+  color: var(--gilt);
+}
+
+.focus {
+  padding-top: 30px;
+}
+
+.focus-text {
+  margin-top: 10px;
+  width: 540px;
+  text-wrap: balance; /* newer browsers; the TV just wraps normally */
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 44px;
+  line-height: 50px;
+  letter-spacing: -0.01em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.focus-text.empty {
+  color: var(--lichen);
+  font-size: 34px;
+  line-height: 42px;
+}
+
+.block {
+  padding-top: 30px;
+}
+
+.block-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.count {
+  font-size: 15px;
+  line-height: 20px;
+  letter-spacing: 0.04em;
+  color: var(--lichen);
+}
+
+.allday {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 12px;
+}
+
+.allday:empty {
+  display: none;
+}
+
+.allday li {
+  font-size: 18px;
+  line-height: 24px;
+  padding: 4px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  color: var(--lichen);
+}
+
+.events li {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.events .time {
+  width: 112px;
+  flex-shrink: 0;
+  font-size: 22px;
+  line-height: 30px;
+  color: var(--lichen);
+  font-variant-numeric: tabular-nums;
+}
+
+.events .what {
+  flex: 1;
+  min-width: 0;
+}
+
+.events .title,
+.events .where {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.events .title {
+  font-size: 26px;
+  line-height: 32px;
+}
+
+.events .where {
+  font-size: 18px;
+  line-height: 24px;
+  color: var(--lichen);
+}
+
+.events .tail {
+  flex-shrink: 0;
+  padding-left: 16px;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 20px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gilt);
+  white-space: nowrap;
+}
+
+.events .past {
+  opacity: 0.45;
+}
+
+/* The meeting you're in (or the next one) leads: bigger, gilt, a hanging dot. */
+.events .lead {
+  padding: 12px 0;
+}
+
+.events .lead .time {
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--gilt);
+}
+
+.events .lead .title {
+  font-size: 29px;
+  line-height: 36px;
+  font-weight: 500;
+}
+
+.events .now::before {
+  content: '';
+  position: absolute;
+  left: -30px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin-top: -5px;
+  border-radius: 5px;
+  background: var(--gilt);
+  box-shadow: 0 0 0 6px rgba(200, 164, 92, 0.18);
+}
+
+.tasks li {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 9px 0;
+}
+
+.tick {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  border: 1.5px solid var(--lichen);
+}
+
+.task-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 25px;
+  line-height: 30px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tag {
+  flex-shrink: 0;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 18px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--lichen);
+}
+
+.tag.carried {
+  color: var(--gilt);
+}
+
+.tasks .done .tick {
+  border-color: #6f7a70;
+  background: #6f7a70;
+}
+
+.tasks .done .task-text {
+  color: var(--faint);
+  text-decoration: line-through;
+}
+
+.more,
+.empty-line {
+  padding: 11px 0;
+  font-size: 20px;
+  line-height: 28px;
+  color: var(--faint);
+}
+
+.empty-line {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 26px;
+  color: var(--lichen);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.recap {
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+}
+
+.recap-text {
+  margin-top: 6px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 30px;
+  line-height: 36px;
+}
+
+.status {
+  position: absolute;
+  right: 0;
+  bottom: -40px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+/* ── Setup screen (no key / bad key) ──────────────────────── */
+
+.notice {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 0 10vw;
+  background: #2e3b36;
+}
+
+.notice h2 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 5vw;
+}
+
+.notice p {
+  margin-top: 2vw;
+  max-width: 60vw;
+  font-size: 1.6vw;
+  line-height: 1.45;
+  color: var(--lichen);
+}
+
+/* ── Full bleed: the painting is the wall, the day is a placard ────────
+ * Hidden unless body has .bleed. Cobalt comes from the blue shadows that run
+ * through most of the impressionist rotation. */
+
+.bleed-art,
+.bleed-fill,
+.scrim,
+.credit,
+.placard {
+  display: none;
+}
+
+.bleed {
+  --ink: #1c1a16;
+  --ink-2: #5c574d;
+  --cobalt: #34507f;
+  --paper: #efe9dc;
+  --rule-ink: #d3ccbd;
+  --done: #8a8376;
+}
+
+.bleed .wall,
+.bleed .art,
+.bleed .label {
+  display: none;
+}
+
+/* The whole painting, full height, never cropped (JS sizes it from its
+   ratio). Whatever it doesn't cover — mostly behind the placard — is the same
+   painting, blurred and darkened. */
+.bleed .bleed-fill {
+  display: block;
+  position: absolute;
+  top: -60px;
+  left: -60px;
+  width: 2040px;
+  height: 1200px;
+  object-fit: cover;
+  -webkit-filter: blur(36px) brightness(0.62) saturate(1.1);
+  filter: blur(36px) brightness(0.62) saturate(1.1);
+}
+
+.bleed .bleed-art {
+  display: block;
+  position: absolute;
+  top: 0;
+  height: 1080px;
+  object-fit: cover;
+}
+
+/* Feather the edges into the blurred fill instead of a hard line. */
+.bleed .bleed-art.feathered {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 60px, #000 calc(100% - 60px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 60px, #000 calc(100% - 60px), transparent 100%);
+}
+
+.bleed .bleed-fill,
+.bleed .bleed-art {
+  opacity: 0;
+  transition: opacity 1.6s var(--ease);
+}
+
+.bleed .bleed-fill.is-in,
+.bleed .bleed-art.is-in {
+  opacity: 1;
+}
+
+.bleed .scrim {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 640px;
+  width: 1100px;
+  height: 440px;
+  background: linear-gradient(20deg, rgba(14, 12, 9, 0.62) 0%, rgba(14, 12, 9, 0.2) 45%, rgba(14, 12, 9, 0) 70%);
+}
+
+.bleed .credit {
+  display: block;
+  position: absolute;
+  left: 96px;
+  top: 954px;
+  width: 1000px;
+  color: #f4efe4;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+}
+
+.credit-title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 30px;
+  line-height: 34px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.credit-meta {
+  margin-top: 2px;
+  font-size: 17px;
+  line-height: 24px;
+  letter-spacing: 0.02em;
+  color: rgba(244, 239, 228, 0.86);
+}
+
+.bleed .placard {
+  display: block;
+  position: absolute;
+  left: 1228px;
+  top: 64px;
+  width: 612px;
+  height: 952px;
+  background: var(--paper);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.25), 0 30px 60px -20px rgba(0, 0, 0, 0.55);
+}
+
+.bleed .day {
+  left: 1284px;
+  top: 112px;
+  width: 500px;
+  height: 780px;
+  color: var(--ink);
+}
+
+.bleed .eyebrow {
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--cobalt);
+}
+
+.bleed .clock {
+  padding-top: 8px;
+  font-size: 168px;
+  line-height: 150px;
+}
+
+.bleed .period {
+  font-size: 20px;
+  line-height: 26px;
+  color: var(--ink-2);
+  padding: 20px 0 0 12px;
+}
+
+.bleed .focus {
+  padding-top: 20px;
+}
+
+.bleed #focus-label {
+  display: none;
+}
+
+.bleed .focus-text {
+  margin-top: 0;
+  width: 470px;
+  font-size: 38px;
+  line-height: 44px;
+  letter-spacing: 0;
+}
+
+.bleed .focus-text.empty {
+  color: var(--ink-2);
+  font-size: 30px;
+  line-height: 38px;
+}
+
+.bleed .block {
+  padding-top: 26px;
+}
+
+.bleed .block-head {
+  padding-bottom: 8px;
+  border-bottom-color: var(--ink);
+}
+
+.bleed .kicker,
+.bleed .count {
+  font-size: 14px;
+  line-height: 18px;
+  color: var(--ink-2);
+}
+
+.bleed .kicker {
+  font-weight: 600;
+}
+
+.bleed .allday li {
+  border-color: var(--rule-ink);
+  color: var(--ink-2);
+}
+
+.bleed .events li {
+  padding: 10px 0;
+  border-bottom-color: var(--rule-ink);
+}
+
+.bleed .events li:last-child {
+  border-bottom: 0;
+}
+
+.bleed .events .time,
+.bleed .events .lead .time {
+  width: 92px;
+  font-size: 21px;
+  line-height: 28px;
+  color: var(--ink-2);
+}
+
+.bleed .events .title,
+.bleed .events .lead .title {
+  font-size: 24px;
+  line-height: 30px;
+}
+
+.bleed .events .lead .time {
+  font-weight: 600;
+  color: var(--cobalt);
+}
+
+.bleed .events .where,
+.bleed .events .now::before {
+  display: none;
+}
+
+.bleed .events .tail {
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--cobalt);
+}
+
+.bleed .tasks li {
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.bleed .tick {
+  width: 20px;
+  height: 20px;
+  border-color: var(--ink);
+}
+
+.bleed .task-text {
+  font-size: 23px;
+  line-height: 28px;
+}
+
+.bleed .tag {
+  color: var(--ink-2);
+}
+
+.bleed .tag.carried {
+  color: var(--cobalt);
+}
+
+.bleed .tasks .done .tick {
+  border-color: #9a9385;
+  background: #9a9385;
+}
+
+.bleed .tasks .done .task-text {
+  color: var(--done);
+}
+
+.bleed .more,
+.bleed .empty-line {
+  color: var(--ink-2);
+}
+
+.bleed .status {
+  bottom: -120px;
+  color: var(--ink-2);
+}
+
+.bleed .week {
+  left: 1284px;
+  top: 904px;
+  width: 500px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ink);
+}
+
+.bleed .week li {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.bleed .wk-day {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--ink-2);
+}
+
+.bleed .wk-num {
+  margin-top: 2px;
+  padding: 0 8px;
+  font-size: 32px;
+  line-height: 34px;
+  color: var(--ink);
+  border-bottom: 2px solid transparent;
+}
+
+.bleed .wk-dots i,
+.bleed .week .is-today .wk-dots i {
+  background: var(--ink-2);
+}
+
+.bleed .week .is-today .wk-day {
+  color: var(--cobalt);
+}
+
+.bleed .week .is-today .wk-num {
+  border-bottom-color: var(--cobalt);
+}
+
+.bleed .week .is-selected .wk-day {
+  color: var(--ink);
+}
+
+.bleed .week .is-selected .wk-num {
+  border-bottom-color: var(--ink);
+}
+
+.bleed .week .is-weekend .wk-day,
+.bleed .week .is-weekend .wk-num {
+  color: #9a9385;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before {
+    transition: none !important;
+  }
+}

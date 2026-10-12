@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Frame Dashboard</title>
+    <style>
+      html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #15130f; }
+      iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+      #msg {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        display: flex; align-items: center; justify-content: center; text-align: center;
+        color: #a89f8e; font: 32px/1.4 Georgia, serif; padding: 0 15%; box-sizing: border-box;
+      }
+    </style>
+    <!-- Samsung's TV API, injected by the platform at install time. -->
+    <script src="$WEBAPIS/webapis/webapis.js"></script>
+    <!-- Written by `npm run tizen:config` from DASHBOARD_URL. Gitignored. -->
+    <script src="dashboard-url.js"></script>
+  </head>
+  <body>
+    <div id="msg"></div>
+    <iframe id="screen" allow="autoplay" hidden></iframe>
+    <script src="main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,45 @@
+// Android TV / Google TV / Fire TV shell: a full-screen WebView on the hosted
+// dashboard that starts on boot. No libraries — the platform WebView is enough.
+
+plugins {
+    id "com.android.application"
+}
+
+// The URL carries your read key, so it lives in a gitignored file written by
+// `npm run shell:config`, or comes from -PdashboardUrl=… on the command line.
+def props = new Properties()
+def propsFile = rootProject.file("dashboard.properties")
+if (propsFile.exists()) propsFile.withInputStream { props.load(it) }
+def dashboardUrl = project.findProperty("dashboardUrl") ?: props.getProperty("dashboardUrl", "")
+
+android {
+    namespace "dev.framedashboard.tv"
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "dev.framedashboard.tv"
+        minSdk 23
+        targetSdk 36
+        versionCode 1
+        versionName "0.1.0"
+        buildConfigField "String", "DASHBOARD_URL", "\"${dashboardUrl}\""
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            // Sideloaded, not published: sign with the debug key so the APK
+            // installs without a keystore. Replace for a store release.
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

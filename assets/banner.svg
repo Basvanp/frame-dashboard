@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+  <rect width="320" height="180" fill="#ebe5d9"/>
+  <rect x="24" y="40" width="78" height="100" fill="#1d1a16"/>
+  <rect x="30" y="46" width="66" height="88" fill="#c9b48f"/>
+  <circle cx="76" cy="72" r="12" fill="#9a4b1f"/>
+  <path d="M30 134 L30 108 Q48 94 66 108 T96 104 L96 134 Z" fill="#5f6b4e"/>
+  <text x="122" y="88" font-family="Georgia, serif" font-size="30" fill="#1f1c17">Frame</text>
+  <text x="122" y="120" font-family="Georgia, serif" font-style="italic" font-size="26" fill="#5f574b">Dashboard</text>
+</svg>

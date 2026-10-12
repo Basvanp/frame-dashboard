@@ -1,0 +1,23 @@
+{
+  "weekOf": "2026-10-12",
+  "focus": "Ship the landing page and close the quarter plan",
+  "days": {
+    "2026-10-12": {
+      "focus": "Finish the landing page copy before lunch",
+      "tasks": [
+        { "text": "Write hero and pricing copy", "tag": "Site" },
+        { "text": "Review Ana's onboarding mocks", "tag": "Design" },
+        { "text": "Send invoice to the agency", "done": true },
+        "Book flights for the conference",
+        "Call the bank about the card"
+      ]
+    },
+    "2026-10-13": {
+      "focus": "Deep work: analytics dashboard",
+      "tasks": ["Draft the metrics spec", "Pair with Luis on the API"]
+    },
+    "2026-10-14": { "focus": "Client day", "tasks": ["Prepare the quarterly deck"] },
+    "2026-10-15": { "focus": "Write and publish the blog post", "tasks": ["Outline", "Draft", "Cover image"] },
+    "2026-10-16": { "focus": "Wrap up the week", "tasks": ["Weekly review", "Plan next Monday"] }
+  }
+}

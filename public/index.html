@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Frame Dashboard</title>
+    <link rel="stylesheet" href="fonts.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!--
+      Laid out at 1920×1080 (what a TV browser reports) and scaled to fit.
+      Two layouts share this markup (see the "Frame App" Paper file):
+      - Full bleed, by day: the painting fills the screen, the day is printed
+        on a bone museum placard.
+      - Salon, after 7 pm and for portrait works: a painted gallery wall, the
+        painting framed under a picture lamp, the day as wall text.
+    -->
+    <main id="stage" class="stage">
+      <div class="wall wall-day" aria-hidden="true"></div>
+      <div class="wall wall-night" aria-hidden="true"></div>
+
+      <!-- Full bleed (by day): the painting is the wall; the day is a placard. -->
+      <img id="bleed-fill" class="bleed-fill" alt="" aria-hidden="true" />
+      <img id="bleed" class="bleed-art" alt="" />
+      <div class="scrim" aria-hidden="true"></div>
+      <div id="credit" class="credit">
+        <div id="credit-title" class="credit-title"></div>
+        <div id="credit-meta" class="credit-meta"></div>
+      </div>
+      <div class="placard" aria-hidden="true"></div>
+
+      <section class="art" aria-label="Artwork of the day">
+        <div id="glow" class="glow"></div>
+        <div id="lamp" class="lamp"><i></i><b></b></div>
+        <div id="frame" class="frame">
+          <div class="liner"><img id="painting" class="painting" alt="" /></div>
+        </div>
+      </section>
+
+      <div id="label" class="label">
+        <div id="label-artist" class="label-artist"></div>
+        <div id="label-title" class="label-title"></div>
+        <div id="label-meta" class="label-meta"></div>
+      </div>
+
+      <ol id="week" class="week" aria-label="This week"></ol>
+
+      <section id="day" class="day" aria-live="polite">
+        <header>
+          <p id="eyebrow" class="eyebrow"></p>
+          <p class="clock"><span id="clock-time"></span><span id="clock-period" class="period"></span></p>
+        </header>
+
+        <div class="focus">
+          <p id="focus-label" class="kicker accent"></p>
+          <p id="focus" class="focus-text"></p>
+        </div>
+
+        <div class="block">
+          <div class="block-head">
+            <p id="schedule-label" class="kicker"></p>
+            <p id="schedule-count" class="count"></p>
+          </div>
+          <ul id="allday" class="allday"></ul>
+          <ul id="events" class="events"></ul>
+        </div>
+
+        <div class="block">
+          <div class="block-head">
+            <p id="tasks-label" class="kicker"></p>
+            <p id="tasks-count" class="count"></p>
+          </div>
+          <ul id="tasks" class="tasks"></ul>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div id="recap" class="recap" hidden>
+          <p id="recap-label" class="kicker"></p>
+          <p id="recap-text" class="recap-text"></p>
+        </div>
+
+        <p id="status" class="status"></p>
+      </section>
+    </main>
+
+    <div id="notice" class="notice" hidden>
+      <h2 id="notice-title"></h2>
+      <p id="notice-body"></p>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

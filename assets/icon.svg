@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#ebe5d9"/>
+  <!-- a hung frame: painting on the left, two lines of wall text on the right -->
+  <rect x="88" y="132" width="200" height="248" fill="#1d1a16"/>
+  <rect x="104" y="148" width="168" height="216" fill="#c9b48f"/>
+  <circle cx="214" cy="214" r="30" fill="#9a4b1f"/>
+  <path d="M104 364 L104 300 Q150 262 196 300 T272 292 L272 364 Z" fill="#5f6b4e"/>
+  <rect x="320" y="150" width="104" height="44" rx="6" fill="#1f1c17"/>
+  <rect x="320" y="226" width="104" height="10" rx="5" fill="#9a4b1f"/>
+  <rect x="320" y="258" width="84" height="10" rx="5" fill="#7d7466"/>
+  <rect x="320" y="290" width="96" height="10" rx="5" fill="#7d7466"/>
+  <rect x="320" y="322" width="64" height="10" rx="5" fill="#7d7466"/>
+</svg>
