@@ -15,8 +15,8 @@
    "ratio": 1.188,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP136056.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/438849",
-   "fact": null,
-   "factSource": null
+   "fact": "King Ludwig I of Bavaria commissioned large landscapes exclusively from Rottmann.",
+   "factSource": "https://en.wikipedia.org/wiki/Carl_Rottmann"
   },
   {
    "slug": "met-guardi-fantastic-landscape",
@@ -29,8 +29,8 @@
    "ratio": 1.208,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DT4562.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/436594",
-   "fact": null,
-   "factSource": null
+   "fact": "Guardi was among the last painters of the classic Venetian school.",
+   "factSource": "https://en.wikipedia.org/wiki/Francesco_Guardi"
   },
   {
    "slug": "met-dughet-imaginary-landscape",
@@ -43,8 +43,8 @@
    "ratio": 1.583,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP225500.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/436229",
-   "fact": null,
-   "factSource": null
+   "fact": "Gaspard Dughet also went by the name Gaspard Poussin.",
+   "factSource": "https://en.wikipedia.org/wiki/Gaspard_Dughet"
   },
   {
    "slug": "met-gainsborough-wooded-upland-landscape",
@@ -57,8 +57,8 @@
    "ratio": 1.24,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP123922.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/436441",
-   "fact": null,
-   "factSource": null
+   "fact": "Though famous for portraits, Gainsborough found more satisfaction in painting landscapes.",
+   "factSource": "https://en.wikipedia.org/wiki/Thomas_Gainsborough"
   },
   {
    "slug": "met-bocklin-roman-landscape",
@@ -71,8 +71,8 @@
    "ratio": 1.272,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP-23285-001.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/435684",
-   "fact": null,
-   "factSource": null
+   "fact": "Böcklin’s five versions of the Isle of the Dead inspired works by late Romantic composers.",
+   "factSource": "https://en.wikipedia.org/wiki/Arnold_B%C3%B6cklin"
   },
   {
    "slug": "met-koninck-wide-river-landscape",
@@ -85,8 +85,8 @@
    "ratio": 1.39,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP146493.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/436832",
-   "fact": null,
-   "factSource": null
+   "fact": "Koninck split his panoramas in half, horizontally, between equal measures of earth and sky.",
+   "factSource": "https://en.wikipedia.org/wiki/Philips_Koninck"
   },
   {
    "slug": "met-rousseau-a-river-landscape",
@@ -99,8 +99,8 @@
    "ratio": 1.505,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP274261.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/437519",
-   "fact": null,
-   "factSource": null
+   "fact": "Théodore Rousseau was a painter of the Barbizon School.",
+   "factSource": "https://en.wikipedia.org/wiki/Th%C3%A9odore_Rousseau"
   },
   {
    "slug": "met-neer-landscape-at-sunset",
@@ -113,8 +113,8 @@
    "ratio": 1.416,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP146446.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/437191",
-   "fact": null,
-   "factSource": null
+   "fact": "Van der Neer specialized in small night scenes lit only by moonlight and fires.",
+   "factSource": "https://en.wikipedia.org/wiki/Aert_van_der_Neer"
   },
   {
    "slug": "met-bourdon-a-classical-landscape",
@@ -127,8 +127,8 @@
    "ratio": 1.316,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP123839.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/435756",
-   "fact": null,
-   "factSource": null
+   "fact": "Bourdon’s masterpiece, The Crucifixion of St. Peter, was painted for Notre-Dame cathedral.",
+   "factSource": "https://en.wikipedia.org/wiki/S%C3%A9bastien_Bourdon"
   },
   {
    "slug": "met-post-a-brazilian-landscape",
@@ -141,8 +141,8 @@
    "ratio": 1.516,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP145952.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/437323",
-   "fact": null,
-   "factSource": null
+   "fact": "Frans Post was the first European artist to paint landscapes of the Americas.",
+   "factSource": "https://en.wikipedia.org/wiki/Frans_Post"
   },
   {
    "slug": "met-molijn-landscape-with-a-cottage",
@@ -155,8 +155,8 @@
    "ratio": 1.475,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP146459.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/437102",
-   "fact": null,
-   "factSource": null
+   "fact": "Pieter de Molijn was born in London in 1595 and worked in Haarlem.",
+   "factSource": "https://en.wikipedia.org/wiki/Pieter_de_Molijn"
   },
   {
    "slug": "met-seurat-landscape-at-saint-ouen",
@@ -169,8 +169,8 @@
    "ratio": 1.471,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP-19196-001.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/437657",
-   "fact": null,
-   "factSource": null
+   "fact": "Seurat devised the techniques known as chromoluminarism and pointillism.",
+   "factSource": "https://en.wikipedia.org/wiki/Georges_Seurat"
   },
   {
    "slug": "met-koekkoek-winter-landscape-holland",
@@ -183,8 +183,8 @@
    "ratio": 1.215,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP143197.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/436826",
-   "fact": null,
-   "factSource": null
+   "fact": "Koekkoek is the most famous member of the Koekkoek family of painters.",
+   "factSource": "https://en.wikipedia.org/wiki/Barend_Cornelis_Koekkoek"
   },
   {
    "slug": "met-strij-landscape-with-cattle",
@@ -197,8 +197,8 @@
    "ratio": 1.34,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP143202.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/437760",
-   "fact": null,
-   "factSource": null
+   "fact": "Van Strij painted mostly landscapes: mountains, winter scenes and marines.",
+   "factSource": "https://en.wikipedia.org/wiki/Jacob_van_Strij"
   },
   {
    "slug": "met-koninck-an-extensive-wooded-landscape",
@@ -211,8 +211,8 @@
    "ratio": 1.351,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP146508.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/436831",
-   "fact": null,
-   "factSource": null
+   "fact": "Koninck ran a barge line between Amsterdam and Rotterdam, so his business travelled through his own landscapes.",
+   "factSource": "https://en.wikipedia.org/wiki/Philips_Koninck"
   },
   {
    "slug": "met-denis-mountainous-landscape-at-vicovaro",
@@ -225,8 +225,8 @@
    "ratio": 1.486,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP169450.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/438640",
-   "fact": null,
-   "factSource": null
+   "fact": "Simon Denis was born in Antwerp and died in Naples in 1813.",
+   "factSource": "https://en.wikipedia.org/wiki/Simon_Denis"
   },
   {
    "slug": "met-denis-mountainous-landscape-at-tivoli",
@@ -239,8 +239,8 @@
    "ratio": 1.757,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP169451.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/438641",
-   "fact": null,
-   "factSource": null
+   "fact": "Simon Denis was a Flemish painter who worked mainly in Italy.",
+   "factSource": "https://en.wikipedia.org/wiki/Simon_Denis"
   },
   {
    "slug": "met-mauperche-classical-landscape-with-figures",
@@ -253,8 +253,8 @@
    "ratio": 1.513,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP-23425-001.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/437039",
-   "fact": null,
-   "factSource": null
+   "fact": "Most of Mauperché’s landscapes are capriccios.",
+   "factSource": "https://en.wikipedia.org/wiki/Henri_Mauperch%C3%A9"
   },
   {
    "slug": "met-daubigny-a-river-landscape-with-storks",
@@ -267,8 +267,8 @@
    "ratio": 1.81,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP-19020-001.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/436083",
-   "fact": null,
-   "factSource": null
+   "fact": "Daubigny, of the Barbizon school, is considered an important precursor of Impressionism.",
+   "factSource": "https://en.wikipedia.org/wiki/Charles-Fran%C3%A7ois_Daubigny"
   },
   {
    "slug": "met-younger-landscape-with-thatched-cottages",
@@ -281,8 +281,8 @@
    "ratio": 1.333,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/ep22.47.3.bw.R.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/437781",
-   "fact": null,
-   "factSource": null
+   "fact": "Teniers founded the Antwerp Academy and was court painter to Archduke Leopold Wilhelm.",
+   "factSource": "https://en.wikipedia.org/wiki/David_Teniers_the_Younger"
   },
   {
    "slug": "met-daubigny-landscape-on-a-river",
@@ -295,8 +295,8 @@
    "ratio": 1.764,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP-19584-001.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/436081",
-   "fact": null,
-   "factSource": null
+   "fact": "Daubigny was a prolific etcher and one of the main artists of the cliché-verre technique.",
+   "factSource": "https://en.wikipedia.org/wiki/Charles-Fran%C3%A7ois_Daubigny"
   },
   {
    "slug": "met-gellee-pastoral-landscape-the-roman-campagna",
@@ -309,8 +309,8 @@
    "ratio": 1.331,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP-17628-001.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/435906",
-   "fact": null,
-   "factSource": null
+   "fact": "By the end of the 1630s, Claude was the leading landscape painter in Italy.",
+   "factSource": "https://en.wikipedia.org/wiki/Claude_Lorrain"
   },
   {
    "slug": "met-corot-landscape-with-figures-les-bohemiens",
@@ -323,8 +323,8 @@
    "ratio": 1.396,
    "remote": "https://images.metmuseum.org/CRDImages/ep/original/DP-16064-001.jpg",
    "source": "https://www.metmuseum.org/art/collection/search/435964",
-   "fact": null,
-   "factSource": null
+   "fact": "Corot’s landscapes looked back to Neo-Classicism and ahead to the plein-air painting of Impressionism.",
+   "factSource": "https://en.wikipedia.org/wiki/Jean-Baptiste-Camille_Corot"
   }
  ]
 }

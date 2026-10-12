@@ -179,6 +179,11 @@ const PACKS = {
   },
 };
 
+// Facts for works the museum didn't annotate, each from a Wikipedia article
+// (artist or print series) kept as its source. Written by hand from the
+// article text; rebuilding a pack keeps them.
+const extraFacts = JSON.parse(readFileSync('art/pack-facts.json', 'utf8'));
+
 const wanted = process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(PACKS);
 mkdirSync('art/packs', { recursive: true });
 for (const id of wanted) {
@@ -187,7 +192,8 @@ for (const id of wanted) {
   const seen = new Set();
   const works = (await pack.build())
     .filter((w) => !seen.has(w.slug) && seen.add(w.slug))
-    .map(({ _type, _department, _classification, ...w }) => w);
+    .map(({ _type, _department, _classification, ...w }) => w)
+    .map((w) => (w.fact || !extraFacts[w.slug] ? w : { ...w, fact: extraFacts[w.slug].fact, factSource: extraFacts[w.slug].source }));
   writeFileSync(
     `art/packs/${id}.json`,
     `${JSON.stringify({ id, name: pack.name, description: pack.description, license: 'CC0', works }, null, 1)}\n`

@@ -301,8 +301,8 @@
    "ratio": 1.274,
    "remote": "https://openaccess-cdn.clevelandart.org/1916.823/1916.823_print.jpg",
    "source": "https://clevelandart.org/art/1916.823",
-   "fact": null,
-   "factSource": null
+   "fact": "Herman van Swanevelt was a Dutch painter and etcher of the Baroque era.",
+   "factSource": "https://en.wikipedia.org/wiki/Herman_van_Swanevelt"
   },
   {
    "slug": "cma-wyant-arkville-landscape",
@@ -331,8 +331,8 @@
    "ratio": 1.227,
    "remote": "https://openaccess-cdn.clevelandart.org/1958.472/1958.472_print.jpg",
    "source": "https://clevelandart.org/art/1958.472",
-   "fact": null,
-   "factSource": null
+   "fact": "Rosa’s wild, untamed landscapes became prototypes of the Romantic landscape.",
+   "factSource": "https://en.wikipedia.org/wiki/Salvator_Rosa"
   },
   {
    "slug": "cma-lorrain-italian-landscape",
@@ -346,8 +346,8 @@
    "ratio": 1.381,
    "remote": "https://openaccess-cdn.clevelandart.org/1946.73/1946.73_print.jpg",
    "source": "https://clevelandart.org/art/1946.73",
-   "fact": null,
-   "factSource": null
+   "fact": "Claude Lorrain brought the sun and streaming sunlight into landscape painting, where it had been rare.",
+   "factSource": "https://en.wikipedia.org/wiki/Claude_Lorrain"
   },
   {
    "slug": "cma-cole-view-of-florence",
@@ -391,8 +391,8 @@
    "ratio": 1.336,
    "remote": "https://openaccess-cdn.clevelandart.org/1970.30/1970.30_print.jpg",
    "source": "https://clevelandart.org/art/1970.30",
-   "fact": null,
-   "factSource": null
+   "fact": "Gaspard Dughet was a French painter born in Rome in 1615.",
+   "factSource": "https://en.wikipedia.org/wiki/Gaspard_Dughet"
   },
   {
    "slug": "cma-wijnants-landscape-with-hunters",
@@ -451,8 +451,8 @@
    "ratio": 1.474,
    "remote": "https://openaccess-cdn.clevelandart.org/1975.78/1975.78_print.jpg",
    "source": "https://clevelandart.org/art/1975.78",
-   "fact": null,
-   "factSource": null
+   "fact": "Georges Michel was a precursor of the Barbizon school.",
+   "factSource": "https://en.wikipedia.org/wiki/Georges_Michel"
   },
   {
    "slug": "cma-benouville-landscape-with-rider-on-white-horse",
@@ -496,8 +496,8 @@
    "ratio": 1.941,
    "remote": "https://openaccess-cdn.clevelandart.org/1975.20/1975.20_print.jpg",
    "source": "https://clevelandart.org/art/1975.20",
-   "fact": null,
-   "factSource": null
+   "fact": "A Hudson River School painter, Whittredge was president of the National Academy of Design in 1874–75.",
+   "factSource": "https://en.wikipedia.org/wiki/Worthington_Whittredge"
   },
   {
    "slug": "cma-durand-trees-on-a-rocky-hillside",
