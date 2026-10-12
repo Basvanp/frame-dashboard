@@ -83,6 +83,33 @@ The secret iCal address gives read access to that calendar, so treat it like a
 password. The read key is in the TV app's URL, so anyone holding the URL sees
 your day. Keep the URL off public screens.
 
+## Frame Desk (Mac menu bar app)
+
+<img src="docs/desk.png" width="300" align="right" alt="Frame Desk popover" />
+
+A remote for the wall, in your menu bar. It shows what's next with a
+countdown, today's focus, your to-dos (add, tick, remove) and meetings, and
+lets you click through the week. The menu bar itself shows the next meeting
+("Standup in 12m") or how many to-dos are left.
+
+It also reads this week's meetings from **every calendar on the Mac**
+(iCloud, Google, Exchange: whatever Calendar.app has, minus birthdays and
+subscribed calendars) and sends them to the dashboard. The TV shows meetings
+without a secret iCal URL. They're as fresh as the last sync, so a sleeping
+Mac means meetings go stale. `ICS_URLS` remains the always-on option, and
+when both are set the two are merged.
+
+```bash
+open mac/FrameDesk.xcworkspace     # build & run the FrameDesk scheme (macOS 14+)
+```
+
+On first launch, click the frame icon in the menu bar, then enter your
+dashboard URL and your **write key** (it reads too). The key is stored in
+the Keychain. Allow Calendar access when asked, and turn on *Open at login*
+in Settings.
+
+<br clear="right" />
+
 ## Plan the week
 
 In Claude Code, from this folder, say **"plan my week"**. The `plan-week`

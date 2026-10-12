@@ -69,6 +69,13 @@ the change up within five minutes.
 
 ## Mid-week updates
 
+Day-to-day edits usually happen in the Frame Desk menu bar app (add, tick,
+remove). It writes the same plan document, so **always fetch the current plan
+before changing it**. A local file can be stale by hours. Meetings pushed by
+the app live in a separate document (`/api/events`); never copy them into the
+plan.
+
+
 "Mark X done", "move Y to Thursday", "add Z today": fetch the current plan
 (step 1), edit it, push it. The whole week is replaced on every push, so always
 start from what the server has, not from a stale local file.
