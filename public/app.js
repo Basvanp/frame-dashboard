@@ -775,6 +775,21 @@
 
   // ── Boot ─────────────────────────────────────────────────────────────
 
+  // The three painting <img>s start without a source, so they are created
+  // here rather than shipped empty in the HTML.
+  function makeImg(id, cls, parent, before) {
+    var img = document.createElement('img');
+    img.id = id;
+    img.className = cls;
+    img.alt = '';
+    parent.insertBefore(img, before || null);
+    return img;
+  }
+  var scrim = document.querySelector('.scrim');
+  makeImg('bleed-fill', 'bleed-fill', scrim.parentNode, scrim).setAttribute('aria-hidden', 'true');
+  makeImg('bleed', 'bleed-art', scrim.parentNode, scrim);
+  makeImg('painting', 'painting', $('liner'));
+
   window.addEventListener('resize', fit);
   fit();
   try {
