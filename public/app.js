@@ -5,7 +5,7 @@
  * (Tizen 6.5, about Chromium 85) and old Android TV WebViews, with no build.
  *
  * Query params: k (read key, remembered), lang (en|es), mode (day|night|auto),
- * layout (bleed|salon), date (YYYY-MM-DD, preview another week),
+ * layout (bleed|salon|painting), date (YYYY-MM-DD, preview another week),
  * at (HH:MM, pretend it's this time).
  */
 (function () {
@@ -241,10 +241,12 @@
     return localParts(now()).hour >= EVENING_FROM;
   }
 
-  // Full bleed by day; the salon after dark (a bright placard would glare in
-  // a dim room) and for portrait works, which a 16:9 crop would butcher.
+  // The design (Settings → layout): "bleed" is full bleed by day and the
+  // salon after dark (a bright placard would glare in a dim room); "salon"
+  // keeps the gallery wall all day; "painting" keeps full bleed day and night.
   function useBleed(art, night) {
     var layout = params.get('layout') || (state.data && state.data.layout) || 'bleed';
+    if (layout === 'painting') return !!art;
     return layout === 'bleed' && !night && !!art;
   }
 

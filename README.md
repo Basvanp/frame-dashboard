@@ -21,8 +21,12 @@ Google TV / Fire TV sticks, and it works in any browser.
   painting hangs in a gilt frame (or a black frame with a mat for works on
   paper) under a picture lamp, and the wall text turns to tomorrow. It shows
   tomorrow's focus and meetings, today's unfinished tasks marked "From
-  today", and a one-line recap of the day. Set `DASHBOARD_LAYOUT=salon` to
-  keep the gallery wall all day.
+  today", and a one-line recap of the day.
+- **Design.** Pick it in Settings (`PUT /api/settings { "layout": … }`, from
+  Daybook or an agent): `bleed` (the default) shows the painting by day and
+  the salon at night, `salon` keeps the gallery wall all day, and `painting`
+  keeps the painting full-screen day and night. `DASHBOARD_LAYOUT` sets the
+  default.
 - **Remote.** ← → browse the week; OK goes back to today.
 - **No data in the repo.** Your plan is stored in Redis, and your calendar is
   read from its secret iCal address.
