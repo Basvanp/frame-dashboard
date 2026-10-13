@@ -94,7 +94,16 @@ public struct ArtPack: Codable, Hashable, Sendable, Identifiable {
     public var count: Int
 }
 
+public struct ScreenLayout: Codable, Hashable, Sendable, Identifiable {
+    public var id: String
+    public var name: String
+    public var description: String?
+}
+
 struct ArtSettings: Codable, Sendable {
     var packs: [ArtPack]
     var enabled: [String]
+    // Newer dashboards only.
+    var layout: String?
+    var layouts: [ScreenLayout]?
 }

@@ -16,6 +16,8 @@ public final class DeskModel {
     // Art packs (which collections the TV draws paintings from)
     var artPacks: [ArtPack] = []
     var enabledPacks: Set<String> = []
+    var layouts: [ScreenLayout] = []
+    var layout: String?
 
     // Settings
     var baseURL: String { didSet { UserDefaults.standard.set(baseURL, forKey: "baseURL") } }
@@ -187,6 +189,8 @@ public final class DeskModel {
             let s = try await api.artSettings()
             artPacks = s.packs
             enabledPacks = Set(s.enabled)
+            layouts = s.layouts ?? []
+            layout = s.layout
         } catch {
             self.error = error.localizedDescription
         }
@@ -204,6 +208,18 @@ public final class DeskModel {
         } catch {
             self.error = error.localizedDescription
             await loadArtPacks()
+        }
+    }
+
+    func setLayout(_ id: String) async {
+        guard let api, id != layout else { return }
+        let before = layout
+        layout = id
+        do {
+            try await api.saveLayout(id)
+        } catch {
+            layout = before
+            self.error = error.localizedDescription
         }
     }
 
