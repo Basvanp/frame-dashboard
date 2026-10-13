@@ -42,8 +42,13 @@
     if (e.keyCode === 10009) exitApp(); // Back / Return
   });
 
+  // Back from Art Mode or another input: screensaver off again, and reload
+  // the dashboard so it isn't showing whatever it had when it was paused.
   document.addEventListener('visibilitychange', function () {
-    if (!document.hidden) screensaverOff();
+    if (!document.hidden) {
+      screensaverOff();
+      if (window.DASHBOARD_URL) frame.src = window.DASHBOARD_URL;
+    }
   });
 
   screensaverOff();

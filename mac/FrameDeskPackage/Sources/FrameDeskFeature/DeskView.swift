@@ -53,7 +53,11 @@ public struct DeskView: View {
                 .help(problem ?? syncedText)
             Spacer()
             Button { showSettings = true } label: {
-                Image(systemName: "slider.horizontal.3").font(Theme.text(12)).foregroundStyle(Theme.ink2)
+                Image(systemName: "slider.horizontal.3")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.ink2)
+                    .frame(width: 28, height: 28)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .help("Settings")
@@ -113,10 +117,7 @@ struct HeroArt: View {
                     }
                     Spacer()
                     Button {
-                        Task {
-                            await model.syncCalendar()
-                            await model.refresh()
-                        }
+                        Task { await model.syncEverything() }
                     } label: {
                         Image(systemName: "arrow.clockwise")
                             .font(Theme.text(12, .semibold))
@@ -127,7 +128,7 @@ struct HeroArt: View {
                             .background(.ultraThinMaterial, in: Circle())
                     }
                     .buttonStyle(.plain)
-                    .help("Sync now")
+                    .help("Sync now: calendar, this Mac and the TV")
                 }
                 Spacer()
                 NextUp(model: model)
@@ -373,7 +374,11 @@ struct TaskRow: View {
 
             if hover {
                 Button(action: remove) {
-                    Image(systemName: "xmark").font(Theme.text(9, .bold)).foregroundStyle(Theme.ink2)
+                    Image(systemName: "xmark")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(Theme.ink2)
+                        .frame(width: 26, height: 26) // a glyph alone is a 9-point target
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .help("Remove")

@@ -82,6 +82,11 @@ struct DashboardAPI: Sendable {
         _ = try await request("api/settings", method: "PUT", body: try Self.encoder.encode(["packs": enabled]))
     }
 
+    /// Tell every screen to refetch now (bumps the dashboard's version).
+    func pokeScreens() async throws {
+        _ = try await request("api/version", method: "POST")
+    }
+
     func saveLayout(_ layout: String) async throws {
         _ = try await request("api/settings", method: "PUT", body: try Self.encoder.encode(["layout": layout]))
     }

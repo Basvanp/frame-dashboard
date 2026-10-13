@@ -89,6 +89,7 @@
     artShown: null,
     lastLoad: 0,
     version: null,
+    build: null,
     skew: 0, // server clock minus TV clock; TVs drift, the server doesn't
   };
 
@@ -756,6 +757,13 @@
       })
       .then(function (body) {
         if (!body) return;
+        // A new deploy: reload the page itself so the screen runs the new code
+        // (the TV app would otherwise keep the old page until it's reopened).
+        if (state.build && body.build && body.build !== state.build) {
+          location.reload();
+          return;
+        }
+        state.build = body.build || state.build;
         if (state.version !== null && body.version !== state.version) load();
         state.version = body.version;
       })
@@ -790,7 +798,12 @@
     var k = e.keyCode;
     if (k === 37) browse(-1);
     else if (k === 39) browse(1);
-    else if (k === 13 || k === 38 || k === 40) {
+    else if (k === 13) {
+      // OK: back to today, and fetch fresh data.
+      state.selected = null;
+      render();
+      load();
+    } else if (k === 38 || k === 40) {
       state.selected = null;
       render();
     } else return;
@@ -826,5 +839,16 @@
   setInterval(load, REFRESH_MS);
   checkVersion();
   setInterval(checkVersion, VERSION_MS);
+  // Coming back from Art Mode or another input: timers may have been paused,
+  // so catch up at once instead of waiting for the next tick.
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) {
+      checkVersion();
+      load();
+    }
+  });
+  window.addEventListener('focus', function () {
+    checkVersion();
+  });
   setInterval(render, 20 * 1000);
 })();

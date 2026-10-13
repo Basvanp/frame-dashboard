@@ -133,6 +133,17 @@ public final class DeskModel {
         }
     }
 
+    /// The ⟳ button: pull calendar, refetch here, and make the TV repaint now.
+    func syncEverything() async {
+        isBusy = true
+        defer { isBusy = false }
+        await syncCalendar()
+        if let api {
+            do { try await api.pokeScreens() } catch { self.error = error.localizedDescription }
+        }
+        await refresh()
+    }
+
     func saveSettings(url: String, key: String) async {
         baseURL = url
         if !key.isEmpty { Keychain.write(key) }
