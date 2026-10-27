@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="nl">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -45,12 +45,18 @@
         <div id="label-meta" class="label-meta"></div>
       </div>
 
-      <ol id="week" class="week" aria-label="This week"></ol>
+      <ol id="week" class="week" aria-label="Deze week"></ol>
 
       <section id="day" class="day" aria-live="polite">
         <header>
           <p id="eyebrow" class="eyebrow"></p>
-          <p class="clock"><span id="clock-time"></span><span id="clock-period" class="period"></span></p>
+          <p class="clock">
+            <span id="clock-time"></span>
+            <span id="weather" class="weather" hidden>
+              <span id="weather-icon" class="weather-icon" aria-hidden="true"></span>
+              <span id="weather-temp" class="weather-temp"></span>
+            </span>
+          </p>
         </header>
 
         <div class="focus">
@@ -72,6 +78,7 @@
             <p id="tasks-label" class="kicker"></p>
             <p id="tasks-count" class="count"></p>
           </div>
+          <p id="tomorrow-focus" class="tomorrow-focus" hidden></p>
           <ul id="tasks" class="tasks"></ul>
         </div>
 

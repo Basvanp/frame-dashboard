@@ -4,7 +4,7 @@
  * Plain ES2019 in one classic script: it has to run in a 2022 Samsung Frame
  * (Tizen 6.5, about Chromium 85) and old Android TV WebViews, with no build.
  *
- * Query params: k (read key, remembered), lang (en|es), mode (day|night|auto),
+ * Query params: k (read key, remembered), lang (nl|en|es), mode (day|night|auto),
  * layout (bleed|salon|painting), date (YYYY-MM-DD, preview another week),
  * at (HH:MM, pretend it's this time).
  */
@@ -38,7 +38,9 @@
       noMeetings: 'No meetings',
       doneForDay: 'No more meetings today',
       noTasks: 'Nothing planned',
-      noFocus: 'No plan yet — plan the week with Claude',
+      greetMorning: 'Good morning',
+      greetAfternoon: 'Good afternoon',
+      greetEvening: 'Good evening',
       earlier: '{n} earlier',
       more: '+{n} more',
       wrapped: 'Today, wrapped',
@@ -48,6 +50,59 @@
       keyBody: 'Open this page with ?k=your-read-key, or set the URL in the TV app.',
       badKeyTitle: 'Key not accepted',
       badKeyBody: 'The read key in the URL does not match DASHBOARD_READ_KEY on the server.',
+      wx_clear: 'Clear',
+      wx_mainly: 'Mostly clear',
+      wx_partly: 'Partly cloudy',
+      wx_cloudy: 'Cloudy',
+      wx_fog: 'Fog',
+      wx_drizzle: 'Drizzle',
+      wx_rain: 'Rain',
+      wx_freeze: 'Freezing rain',
+      wx_snow: 'Snow',
+      wx_showers: 'Showers',
+      wx_storm: 'Thunderstorm',
+    },
+    nl: {
+      todaysFocus: 'Focus van vandaag',
+      tomorrowsFocus: 'Focus van morgen',
+      focusFor: 'Focus',
+      schedule: 'Agenda',
+      tomorrow: 'Morgen',
+      tasks: 'Te doen',
+      tasksTomorrow: 'Morgen te doen',
+      meetings: ['Geen afspraken', '1 afspraak', '{n} afspraken'],
+      doneOf: '{d} van {n} af',
+      planned: ['Niets gepland', '1 gepland', '{n} gepland'],
+      now: 'Nu',
+      minLeft: 'nog {m} min',
+      inMin: 'over {m} min',
+      fromToday: 'Van vandaag',
+      noMeetings: 'Geen afspraken',
+      doneForDay: 'Geen afspraken meer vandaag',
+      noTasks: 'Niets gepland',
+      greetMorning: 'Goedemorgen',
+      greetAfternoon: 'Goedemiddag',
+      greetEvening: 'Goedenavond',
+      earlier: '{n} eerder',
+      more: '+{n} meer',
+      wrapped: 'Vandaag afgerond',
+      updated: 'Bijgewerkt {t}',
+      offline: 'Offline · toont {t}',
+      keyTitle: 'Bijna',
+      keyBody: 'Open deze pagina met ?k=je-sleutel, of zet de URL in de tv-app.',
+      badKeyTitle: 'Sleutel geweigerd',
+      badKeyBody: 'De sleutel in de URL komt niet overeen met DASHBOARD_READ_KEY op de server.',
+      wx_clear: 'Helder',
+      wx_mainly: 'Overwegend helder',
+      wx_partly: 'Half bewolkt',
+      wx_cloudy: 'Bewolkt',
+      wx_fog: 'Mist',
+      wx_drizzle: 'Motregen',
+      wx_rain: 'Regen',
+      wx_freeze: 'IJzel',
+      wx_snow: 'Sneeuw',
+      wx_showers: 'Buien',
+      wx_storm: 'Onweer',
     },
     es: {
       todaysFocus: 'Enfoque de hoy',
@@ -67,7 +122,9 @@
       noMeetings: 'Sin juntas',
       doneForDay: 'No hay más juntas hoy',
       noTasks: 'Nada planeado',
-      noFocus: 'Sin plan todavía — planea la semana con Claude',
+      greetMorning: 'Buenos días',
+      greetAfternoon: 'Buenas tardes',
+      greetEvening: 'Buenas noches',
       earlier: '{n} antes',
       more: '+{n} más',
       wrapped: 'El día, en resumen',
@@ -77,6 +134,17 @@
       keyBody: 'Abre esta página con ?k=tu-clave-de-lectura, o configura la URL en la app de la TV.',
       badKeyTitle: 'Clave no aceptada',
       badKeyBody: 'La clave de la URL no coincide con DASHBOARD_READ_KEY en el servidor.',
+      wx_clear: 'Despejado',
+      wx_mainly: 'Mayormente despejado',
+      wx_partly: 'Parcialmente nublado',
+      wx_cloudy: 'Nublado',
+      wx_fog: 'Niebla',
+      wx_drizzle: 'Llovizna',
+      wx_rain: 'Lluvia',
+      wx_freeze: 'Lluvia helada',
+      wx_snow: 'Nieve',
+      wx_showers: 'Chubascos',
+      wx_storm: 'Tormenta',
     },
   };
 
@@ -114,12 +182,18 @@
   }
 
   function lang() {
-    var l = (params.get('lang') || (state.data && state.data.locale) || 'en').slice(0, 2).toLowerCase();
-    return STRINGS[l] ? l : 'en';
+    var q = (params.get('lang') || '').slice(0, 2).toLowerCase();
+    if (STRINGS[q]) return q;
+    var s = ((state.data && state.data.locale) || '').slice(0, 2).toLowerCase();
+    // "en" is the old stock default. The wall speaks Dutch unless asked otherwise.
+    if (s === 'es' || s === 'nl') return s;
+    return 'nl';
   }
 
   function intlLocale() {
-    return lang() === 'es' ? 'es-MX' : 'en-US';
+    if (lang() === 'es') return 'es-MX';
+    if (lang() === 'nl') return 'nl-NL';
+    return 'en-US';
   }
 
   function t(key, vars) {
@@ -184,16 +258,15 @@
   function timeParts(date) {
     var parts = new Intl.DateTimeFormat(intlLocale(), {
       timeZone: tz(),
-      hour: 'numeric',
+      hour: '2-digit',
       minute: '2-digit',
+      hourCycle: 'h23',
     }).formatToParts(date);
     var main = '';
-    var period = '';
     parts.forEach(function (p) {
-      if (p.type === 'dayPeriod') period += p.value;
-      else if (p.type !== 'literal' || main) main += p.value;
+      if (p.type === 'hour' || p.type === 'minute' || (p.type === 'literal' && main)) main += p.value;
     });
-    return { main: main.trim(), period: period.replace(/[\s.]/g, '').toUpperCase() };
+    return { main: main.trim() };
   }
 
   function shortTime(iso) {
@@ -240,6 +313,11 @@
     if (mode === 'night') return true;
     if (mode === 'day') return false;
     return localParts(now()).hour >= EVENING_FROM;
+  }
+
+  function greeting() {
+    var h = localParts(now()).hour;
+    return t(h < 12 ? 'greetMorning' : h < EVENING_FROM ? 'greetAfternoon' : 'greetEvening');
   }
 
   // The design (Settings → layout): "bleed" is full bleed by day and the
@@ -373,10 +451,44 @@
 
   // ── Rendering ────────────────────────────────────────────────────────
 
+  // Line icons, engraved like the rest of the placard. One drawing per kind.
+  var SUN = '<circle cx="16" cy="16" r="4.5"/><path d="M16 5.2v2.4M16 24.4v2.4M5.2 16h2.4M24.4 16h2.4M8.3 8.3l1.7 1.7M22 22l1.7 1.7M23.7 8.3 22 10M10 22l-1.7 1.7"/>';
+  var CLOUD = '<path d="M9 16.2h14.2a4 4 0 0 0 .3-8 5.7 5.7 0 0 0-11 1.5 3.6 3.6 0 0 0-3.5 6.5z"/>';
+  var ICONS = {
+    clear: SUN,
+    mainly: SUN,
+    partly:
+      '<circle cx="22.2" cy="9.2" r="2.7"/><path d="M22.2 4.2v1.6M22.2 12.6v1.6M17.2 9.2h1.6M25.6 9.2h1.6M18.6 5.6l1.1 1.1M24.7 11.7l1.1 1.1M25.8 5.6l-1.1 1.1M18.6 12.8l1.1-1.1"/><path d="M7.4 24.2h13.4a3.9 3.9 0 0 0 .3-7.8 5.5 5.5 0 0 0-10.6 1.5 3.5 3.5 0 0 0-3.1 6.3z"/>',
+    cloudy: '<path d="M8.2 22.4h15.6a4.8 4.8 0 0 0 .4-9.6 6.8 6.8 0 0 0-13 1.8 4.3 4.3 0 0 0-3 7.8z"/>',
+    fog: '<path d="M6 10.5h20M8 15.5h16M6 20.5h20M9 25.5h14"/>',
+    drizzle: CLOUD + '<path d="M14 19.2v4.2M18.6 19.2v4.2"/>',
+    rain: CLOUD + '<path d="M12.4 19v6.2M16.6 19v6.2M20.8 19v6.2"/>',
+    freeze: CLOUD + '<path d="M12.4 19v6.2M16.6 19v6.2M20.8 19v6.2"/>',
+    showers: CLOUD + '<path d="M12.4 19v6.2M16.6 19v6.2M20.8 19v6.2"/>',
+    snow: CLOUD + '<path d="M12.2 19.4v4.2M10.4 21.5h3.6M17 19.4v4.2M15.2 21.5h3.6M21.6 19.4v4.2M19.8 21.5h3.6"/>',
+    storm: CLOUD + '<path d="M18.2 17.6 15 23h2.8l-1.3 5 5.2-6h-2.8l1.3-4.4z"/>',
+  };
+
   function renderClock() {
-    var p = timeParts(now());
-    $('clock-time').textContent = p.main;
-    $('clock-period').textContent = p.period;
+    $('clock-time').textContent = timeParts(now()).main;
+  }
+
+  function renderWeather() {
+    var box = $('weather');
+    var w = state.data && state.data.weather;
+    if (!w || w.temp == null || !w.kind) {
+      box.hidden = true;
+      return;
+    }
+    box.hidden = false;
+    $('weather-icon').innerHTML =
+      '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' +
+      (ICONS[w.kind] || ICONS.cloudy) +
+      '</svg>';
+    $('weather-temp').textContent = w.temp + '°';
+    var label = w.temp + '°, ' + t('wx_' + w.kind);
+    if (w.high != null) label += ', ' + w.high + '°';
+    box.setAttribute('aria-label', label);
   }
 
   function timedEvents(day) {
@@ -521,6 +633,34 @@
     fitTasks(list, all.length);
   }
 
+  function dayStamp(ymd) {
+    return fmtDay(ymd, { weekday: 'short' }).replace(/\./g, '').toUpperCase() + ' ' + Number(ymd.slice(8));
+  }
+
+  function setTomorrowLine(text) {
+    var line = $('tomorrow-focus');
+    line.hidden = !text;
+    line.textContent = text || '';
+    $('tasks').classList.toggle('under-plan', !!text);
+  }
+
+  // Daytime placard: the old to-do block previews tomorrow (focus + tasks).
+  // Evening already turns the whole column into tomorrow, so that path keeps
+  // the task list under the headline instead of repeating the focus.
+  function renderTomorrow(tomorrow) {
+    var focus = tomorrow && tomorrow.focus;
+    setTomorrowLine(focus || '');
+    $('tasks-label').textContent = t('tomorrow');
+    $('tasks-count').textContent = tomorrow ? dayStamp(tomorrow.date) : '';
+    if (!tomorrow || !tasksOf(tomorrow).length) {
+      clear($('tasks'));
+      if (!focus) $('tasks').appendChild(el('li', 'empty-line', t('noTasks')));
+      return;
+    }
+    renderTasks(tomorrow, [], true);
+    $('tasks-count').textContent = dayStamp(tomorrow.date);
+  }
+
   var MEDIUMS_ES = {
     'oil on canvas': 'Óleo sobre tela',
     'oil on linen canvas': 'Óleo sobre lino',
@@ -557,6 +697,7 @@
 
   var WORDS = {
     en: ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'],
+    nl: ['Geen', 'Eén', 'Twee', 'Drie', 'Vier', 'Vijf', 'Zes', 'Zeven', 'Acht', 'Negen', 'Tien'],
     es: ['Ninguna', 'Una', 'Dos', 'Tres', 'Cuatro', 'Cinco', 'Seis', 'Siete', 'Ocho', 'Nueve', 'Diez'],
   };
 
@@ -580,6 +721,11 @@
           (total ? ', ' + word(done, true) + ' de ' + word(total, true) + ' hechas.' : '.')
       );
       if (c) out.push(c === 1 ? 'Una pasa a mañana.' : word(c) + ' pasan a mañana.');
+    } else if (lang() === 'nl') {
+      var meetings = m === 1 ? 'Eén afspraak' : m === 0 ? 'Geen afspraken' : word(m) + ' afspraken';
+      var doneBit = !total ? '.' : done === 0 ? ', nog niets af.' : ', ' + word(done, true) + ' van ' + word(total, true) + ' af.';
+      out.push(meetings + doneBit);
+      if (c) out.push(c === 1 ? 'Eén schuift door naar morgen.' : word(c) + ' schuiven door naar morgen.');
     } else {
       out.push(
         (m === 1 ? 'One meeting' : word(m) + ' meetings') +
@@ -632,6 +778,7 @@
   function draw() {
     var night = isNight();
     renderClock();
+    renderWeather();
     if (!state.data) {
       document.body.className = night ? 'night' : '';
       return;
@@ -677,10 +824,9 @@
       : t('todaysFocus');
     var focus = $('focus');
     focus.className = 'focus-text' + (day.focus ? '' : ' empty');
-    focus.textContent = day.focus || (state.data.planned ? '' : t('noFocus'));
+    focus.textContent = day.focus || (state.data.planned ? '' : greeting());
 
     $('schedule-label').textContent = evening ? t('tomorrow') : t('schedule');
-    $('tasks-label').textContent = evening ? t('tasksTomorrow') : t('tasks');
 
     var carried =
       evening && today
@@ -690,7 +836,13 @@
         : [];
 
     renderEvents(day, live);
-    renderTasks(day, carried, evening);
+    if (!state.selected && !evening) {
+      renderTomorrow(state.data.tomorrow);
+    } else {
+      setTomorrowLine('');
+      $('tasks-label').textContent = evening ? t('tasksTomorrow') : t('tasks');
+      renderTasks(day, carried, evening);
+    }
 
     var recap = $('recap');
     recap.hidden = !(evening && today);
