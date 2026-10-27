@@ -208,22 +208,6 @@ async function readState() {
   }
 }
 
-let shownId = null;
-let artWasOn = false;
-let notedId = null;
-
-async function reveal(tv, id) {
-  if (!id) return;
-  const on = await tv.artMode().then((mode) => mode === 'on').catch(() => null);
-  const entered = on === 'on' && !artWasOn;
-  if (on === 'on' || on === 'off') artWasOn = on === 'on';
-  if (!entered && id === shownId) return;
-  await tv.select(id, true);
-  shownId = id;
-  notedId = id;
-  console.log(`${new Date().toISOString()} ${id} ${on === 'on' ? 'shown' : 'selected'}`);
-}
-
 async function tick(screen, tv) {
   console.log('Capturing the dashboard');
   const jpeg = await screen.jpeg();
@@ -233,9 +217,6 @@ async function tick(screen, tv) {
   if (state.contentId && !previous.includes(state.contentId)) previous.push(state.contentId);
   await writeFile(stateFile, JSON.stringify({ contentId: id, ids: [...previous, id] }));
   await tv.select(id, true);
-  shownId = id;
-  notedId = id;
-  console.log(`${new Date().toISOString()} ${id} selected`);
   const left = [];
   for (const old of previous) {
     if (old === id) continue;
@@ -250,13 +231,9 @@ async function tick(screen, tv) {
   console.log(`${new Date().toISOString()} ${id} ${(jpeg.length / 1024).toFixed(0)}kb uploaded, replaced ${state.contentId || 'nothing'}`);
 }
 
-async function waitForNextMinute(tv) {
-  const deadline = Date.now() + (60_000 - (Date.now() % 60_000)) + 1500;
-  while (!stopped && Date.now() < deadline) {
-    const state = await readState();
-    if (state.contentId) await reveal(tv, state.contentId);
-    await sleep(Math.min(5000, Math.max(0, deadline - Date.now())));
-  }
+async function waitForNextMinute() {
+  const wait = 60_000 - (Date.now() % 60_000) + 1500;
+  if (wait > 0) await sleep(wait);
 }
 
 function lanHosts() {
@@ -339,15 +316,13 @@ do {
       linked = true;
       console.log(`Frame ${host}:${port} linked. A JPEG goes up at each new minute.`);
     }
-    if (!once && !first) await waitForNextMinute(tv);
+    if (!once && !first) await waitForNextMinute();
     first = false;
     if (stopped) break;
     await tick(screen, tv);
   } catch (err) {
     console.error(err.message);
     linked = false;
-    shownId = null;
-    artWasOn = false;
     tv.close();
     if (/Chrome|devtools|dashboard did not|painting/.test(err.message)) screen.stop();
     if (once) process.exit(1);
