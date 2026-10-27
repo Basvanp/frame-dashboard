@@ -208,15 +208,38 @@ async function readState() {
   }
 }
 
+let shownId = null;
+let artWasOn = false;
+let notedId = null;
+
+async function reveal(tv, id) {
+  if (!id) return;
+  const on = await tv.artMode().then((mode) => mode === 'on');
+  const entered = on && !artWasOn;
+  artWasOn = on;
+  if (!on) {
+    if (id !== notedId) {
+      notedId = id;
+      console.log(`${new Date().toISOString()} ${id} waiting for Art Mode`);
+    }
+    return;
+  }
+  if (!entered && id === shownId) return;
+  await tv.select(id, true);
+  shownId = id;
+  notedId = id;
+  console.log(`${new Date().toISOString()} ${id} shown`);
+}
+
 async function tick(screen, tv) {
+  console.log('Capturing the dashboard');
   const jpeg = await screen.jpeg();
   const state = await readState();
   const id = await tv.uploadJpeg(jpeg, 'none');
-  const show = await tv.artMode().then((mode) => mode === 'on').catch(() => false);
-  await tv.select(id, show);
   const previous = [...(state.ids || [])];
   if (state.contentId && !previous.includes(state.contentId)) previous.push(state.contentId);
   await writeFile(stateFile, JSON.stringify({ contentId: id, ids: [...previous, id] }));
+  await reveal(tv, id);
   const left = [];
   for (const old of previous) {
     if (old === id) continue;
@@ -228,9 +251,16 @@ async function tick(screen, tv) {
     }
   }
   await writeFile(stateFile, JSON.stringify({ contentId: id, ids: left }));
-  const kb = (jpeg.length / 1024).toFixed(0);
-  const was = state.contentId || 'nothing';
-  console.log(`${new Date().toISOString()} ${id} ${kb}kb ${show ? 'shown' : 'queued'} replaced ${was}`);
+  console.log(`${new Date().toISOString()} ${id} ${(jpeg.length / 1024).toFixed(0)}kb uploaded, replaced ${state.contentId || 'nothing'}`);
+}
+
+async function waitForNextMinute(tv) {
+  const deadline = Date.now() + (60_000 - (Date.now() % 60_000)) + 1500;
+  while (!stopped && Date.now() < deadline) {
+    const state = await readState();
+    if (state.contentId) await reveal(tv, state.contentId);
+    await sleep(Math.min(5000, Math.max(0, deadline - Date.now())));
+  }
 }
 
 function lanHosts() {
@@ -313,16 +343,15 @@ do {
       linked = true;
       console.log(`Frame ${host}:${port} linked. A JPEG goes up at each new minute.`);
     }
-    if (!once && !first) {
-      const wait = 60_000 - (Date.now() % 60_000) + 1500;
-      await sleep(wait);
-    }
+    if (!once && !first) await waitForNextMinute(tv);
     first = false;
     if (stopped) break;
     await tick(screen, tv);
   } catch (err) {
     console.error(err.message);
     linked = false;
+    shownId = null;
+    artWasOn = false;
     tv.close();
     if (/Chrome|devtools|dashboard did not|painting/.test(err.message)) screen.stop();
     if (once) process.exit(1);
