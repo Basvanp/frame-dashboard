@@ -6,7 +6,8 @@ ENV FRAME_IN_DOCKER=1 \
     FRAME_STATE_FILE=/data/frame-art.json
 
 RUN apt-get update \
- && apt-get install -y --no-install-recommends chromium fonts-liberation ca-certificates \
+ && apt-get install -y --no-install-recommends chromium fonts-liberation fonts-noto-color-emoji fontconfig ca-certificates \
+ && fc-cache -f \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

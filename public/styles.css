@@ -9,8 +9,8 @@
  */
 
 :root {
-  --serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
-  --sans: 'Geist', 'SamsungOne', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  --serif: 'Instrument Serif', 'Noto Color Emoji', Georgia, 'Times New Roman', serif;
+  --sans: 'Geist', 'Noto Color Emoji', 'SamsungOne', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 
   /* Day: the wall under daylight. */

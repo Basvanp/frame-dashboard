@@ -1,5 +1,6 @@
 /* Self-hosted (SIL Open Font License): a TV with flaky DNS still gets the
-   design's type. Latin subset only, which covers English and Spanish. */
+   design's type. Latin subset for Geist and Instrument Serif; Noto Color Emoji
+   for calendar symbols. */
 
 @font-face {
   font-family: 'Geist';
@@ -23,4 +24,12 @@
   font-weight: 400;
   font-display: swap;
   src: url(fonts/instrument-serif-normal.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'Noto Color Emoji';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(fonts/NotoColorEmoji.ttf) format('truetype');
 }
