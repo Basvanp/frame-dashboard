@@ -644,7 +644,38 @@
     $('tasks').classList.toggle('under-plan', !!text);
   }
 
-  // Daytime placard: the old to-do block previews tomorrow (focus + tasks).
+  function clearTomorrowAgenda() {
+    clear($('tomorrow-allday'));
+    clear($('tomorrow-events'));
+  }
+
+  // Timed rows, same placard treatment as today's agenda, without "now".
+  function renderTomorrowAgenda(tomorrow) {
+    var allday = $('tomorrow-allday');
+    var list = $('tomorrow-events');
+    clear(allday);
+    clear(list);
+    var events = (tomorrow && tomorrow.events) || [];
+    events.forEach(function (e) {
+      if (e.allDay) allday.appendChild(el('li', null, e.title));
+    });
+    var timed = events.filter(function (e) {
+      return !e.allDay && e.start;
+    });
+    var overflow = Math.max(0, timed.length - MAX_EVENTS);
+    timed.slice(0, MAX_EVENTS).forEach(function (e) {
+      var li = el('li');
+      li.appendChild(el('span', 'time', shortTime(e.start)));
+      var what = el('div', 'what');
+      what.appendChild(el('div', 'title', e.title));
+      li.appendChild(what);
+      list.appendChild(li);
+    });
+    if (overflow) list.appendChild(el('li', 'more', t('more', { n: overflow })));
+    return events.length;
+  }
+
+  // Daytime placard: tomorrow's focus, then its appointments, then its tasks.
   // Evening already turns the whole column into tomorrow, so that path keeps
   // the task list under the headline instead of repeating the focus.
   function renderTomorrow(tomorrow) {
@@ -652,9 +683,10 @@
     setTomorrowLine(focus || '');
     $('tasks-label').textContent = t('tomorrow');
     $('tasks-count').textContent = tomorrow ? dayStamp(tomorrow.date) : '';
+    var nEvents = renderTomorrowAgenda(tomorrow);
     if (!tomorrow || !tasksOf(tomorrow).length) {
       clear($('tasks'));
-      if (!focus) $('tasks').appendChild(el('li', 'empty-line', t('noTasks')));
+      if (!focus && !nEvents) $('tasks').appendChild(el('li', 'empty-line', t('noTasks')));
       return;
     }
     renderTasks(tomorrow, [], true);
@@ -840,6 +872,7 @@
       renderTomorrow(state.data.tomorrow);
     } else {
       setTomorrowLine('');
+      clearTomorrowAgenda();
       $('tasks-label').textContent = evening ? t('tasksTomorrow') : t('tasks');
       renderTasks(day, carried, evening);
     }
