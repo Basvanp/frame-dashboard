@@ -360,18 +360,15 @@
     $('stage').style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + s + ')';
   }
 
-  // The painting is centred on the wall above the label shelf. Canvas gets a
-  // gilt frame (16 + 5 liner); paper gets a black frame and a 48px mat.
-  var HANG = { cx: 570, cy: 500, maxW: 980, maxH: 760 };
+  // Unframed, as large as the left wall above the label will take.
+  var HANG = { cx: 540, cy: 448, maxW: 1040, maxH: 850 };
 
   function hangArt(art) {
     if (!art || state.artShown === art.image) return;
     state.artShown = art.image;
 
-    var paper = art.kind === 'paper';
-    var chrome = paper ? (14 + 48) * 2 : (16 + 5) * 2;
-    var innerW = HANG.maxW - chrome;
-    var innerH = HANG.maxH - chrome;
+    var innerW = HANG.maxW;
+    var innerH = HANG.maxH;
     var ratio = art.ratio || 1.3;
     var w = innerW;
     var h = w / ratio;
@@ -379,8 +376,8 @@
       h = innerH;
       w = h * ratio;
     }
-    var outerW = Math.round(w + chrome);
-    var outerH = Math.round(h + chrome);
+    var outerW = Math.round(w);
+    var outerH = Math.round(h);
     var left = Math.round(HANG.cx - outerW / 2);
     var top = Math.round(HANG.cy - outerH / 2);
 
@@ -395,18 +392,11 @@
     var img = new Image();
     img.onload = function () {
       var frame = $('frame');
-      frame.className = 'frame' + (paper ? ' paper' : '');
+      frame.className = 'frame';
       frame.style.left = left + 'px';
       frame.style.top = top + 'px';
       frame.style.width = outerW + 'px';
       frame.style.height = outerH + 'px';
-
-      var lamp = $('lamp');
-      lamp.style.left = HANG.cx - 130 + 'px';
-      lamp.style.top = top - 48 + 'px';
-      var glow = $('glow');
-      glow.style.left = HANG.cx - 460 + 'px';
-      glow.style.top = top - 190 + 'px';
 
       var painting = $('painting');
       painting.src = img.src;
