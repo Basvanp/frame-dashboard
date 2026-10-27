@@ -147,6 +147,109 @@
     },
   };
 
+  // Same index in every language, picked from the date so Art Mode doesn't flicker.
+  var SAYINGS = {
+    nl: [
+      'Morgen is ook een dag.',
+      'Haastige spoed is zelden goed.',
+      'Na regen komt zonneschijn.',
+      'Oost west, thuis best.',
+      'Komt tijd, komt raad.',
+      'Goed begonnen is half gewonnen.',
+      'Bezint eer ge begint.',
+      'De aanhouder wint.',
+      'Wie niet waagt, wie niet wint.',
+      'Spreken is zilver, zwijgen is goud.',
+      'Beter laat dan nooit.',
+      'Al doende leert men.',
+      'Zachtjes aan, dan breekt het lijntje niet.',
+      'In de beperking toont zich de meester.',
+      'Liever een goede buur dan een verre vriend.',
+      'Wie het kleine niet eert, is het grote niet weerd.',
+      'Een dag niet gelachen is een dag niet geleefd.',
+      'Van uitstel komt afstel.',
+      'Alle begin is moeilijk.',
+      'Niet geschoten is altijd mis.',
+      'Wat je zaait, zul je oogsten.',
+      'Hoge bomen vangen veel wind.',
+      'Oude liefde roest niet.',
+      'Eerst denken, dan doen.',
+      'Meten is weten.',
+      'Beter één vogel in de hand dan tien in de lucht.',
+      'Het is altijd het donkerst voor de dageraad.',
+      'Langzaam gaan is ook vooruit.',
+      'Eerst slapen, dan beslissen.',
+      'Wie rust, rust op tijd.',
+      'Elk huisje heeft z’n kruisje.',
+    ],
+    en: [
+      'Tomorrow is another day.',
+      'More haste, less speed.',
+      'After rain comes sunshine.',
+      'East or west, home is best.',
+      'Time will tell.',
+      'Well begun is half done.',
+      'Look before you leap.',
+      'Slow and steady wins.',
+      'Nothing ventured, nothing gained.',
+      'Speech is silver, silence is gold.',
+      'Better late than never.',
+      'We learn by doing.',
+      'Easy does it.',
+      'Restraint is the master.',
+      'A good neighbour is better than a distant friend.',
+      'Mind the small things.',
+      'A day without laughter is a day not lived.',
+      'Put off is put away.',
+      'Every beginning is hard.',
+      'You miss every shot you don’t take.',
+      'You reap what you sow.',
+      'Tall trees catch much wind.',
+      'Old love never rusts.',
+      'Think first, then do.',
+      'Measure twice, cut once.',
+      'A bird in the hand is worth two in the bush.',
+      'Darkest just before dawn.',
+      'Slow is still forward.',
+      'Sleep on it.',
+      'Rest while you can.',
+      'Every house has its cross.',
+    ],
+    es: [
+      'Mañana también es un día.',
+      'Vísteme despacio, que tengo prisa.',
+      'Después de la lluvia, el sol.',
+      'Este o oeste, casa es lo mejor.',
+      'El tiempo da consejo.',
+      'Lo bien empezado está a medio hacer.',
+      'Antes de empezar, pensar.',
+      'Quien la sigue, la consigue.',
+      'Quien no arriesga, no gana.',
+      'Hablar es de plata, callar es de oro.',
+      'Más vale tarde que nunca.',
+      'Haciendo se aprende.',
+      'Despacio, que el hilo no se rompe.',
+      'En la limitación se ve al maestro.',
+      'Más vale un buen vecino que un amigo lejano.',
+      'Quien no valora lo pequeño, no merece lo grande.',
+      'Un día sin risa es un día no vivido.',
+      'Lo que se aplaza, se olvida.',
+      'Todo comienzo es difícil.',
+      'El que no tira, no da.',
+      'Lo que siembras, cosechas.',
+      'Los árboles altos reciben más viento.',
+      'El amor viejo no oxida.',
+      'Primero pensar, luego hacer.',
+      'Medir es saber.',
+      'Más vale pájaro en mano que ciento volando.',
+      'Siempre es más oscuro antes del alba.',
+      'Ir despacio también es avanzar.',
+      'Dormir, y luego decidir.',
+      'Quien descansa, descansa a tiempo.',
+      'Cada casa tiene su cruz.',
+    ],
+  };
+
   var params = new URLSearchParams(location.search);
   var state = {
     data: null,
@@ -314,9 +417,12 @@
     return localParts(now()).hour >= EVENING_FROM;
   }
 
-  function greeting() {
-    var h = localParts(now()).hour;
-    return t(h < 12 ? 'greetMorning' : h < EVENING_FROM ? 'greetAfternoon' : 'greetEvening');
+  function saying(ymd) {
+    var list = SAYINGS[lang()] || SAYINGS.nl;
+    var n = 0;
+    var key = ymd || '';
+    for (var i = 0; i < key.length; i++) n = (n * 33 + key.charCodeAt(i)) | 0;
+    return list[(n >>> 0) % list.length];
   }
 
   // The design (Settings → layout): "bleed" and "painting" keep the work as
@@ -771,7 +877,7 @@
       : t('todaysFocus');
     var focus = $('focus');
     focus.className = 'focus-text' + (day.focus ? '' : ' empty');
-    focus.textContent = day.focus || (state.data.planned ? '' : greeting());
+    focus.textContent = day.focus || (state.data.planned ? '' : saying(day.date));
 
     $('schedule-label').textContent = evening ? t('tomorrow') : t('schedule');
 
