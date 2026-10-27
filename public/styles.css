@@ -540,6 +540,32 @@ ol {
   margin-top: 6px;
 }
 
+/* Tomorrow's agenda: titles in the placard serif, times as a small timetable. */
+#tomorrow-allday li {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 28px;
+  letter-spacing: 0;
+  color: var(--bone);
+}
+
+#tomorrow-events .time {
+  width: 96px;
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+#tomorrow-events .title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 36px;
+  letter-spacing: -0.01em;
+}
+
 .tasks li {
   display: flex;
   align-items: center;
@@ -930,6 +956,26 @@ ol {
 .bleed .tomorrow-focus {
   width: 470px;
   margin-top: 10px;
+  font-size: 26px;
+  line-height: 32px;
+  color: var(--ink);
+}
+
+.bleed #tomorrow-allday li {
+  font-size: 20px;
+  line-height: 26px;
+  color: var(--ink);
+}
+
+.bleed #tomorrow-events .time {
+  width: 84px;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.bleed #tomorrow-events .title {
   font-size: 26px;
   line-height: 32px;
   color: var(--ink);
