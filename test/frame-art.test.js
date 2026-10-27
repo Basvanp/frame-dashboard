@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildUploadFrame, parseFrame } from '../lib/frame-art.js';
+import { artModeValue, buildUploadFrame, isArtReply, parseFrame } from '../lib/frame-art.js';
 
 test('upload frame is a length, a send_image header, then the JPEG', () => {
   const jpeg = Buffer.from([0xff, 0xd8, 0xff, 0xd9]);
@@ -23,4 +23,18 @@ test('a TV frame can carry a binary tail after the JSON', () => {
   const frame = parseFrame(Buffer.concat([json, tail]));
   assert.equal(frame.event, 'd2d_service_message');
   assert.deepEqual([...frame.binary], [0xff, 0xd8]);
+});
+
+test('image_added is not a reply to get_artmode_status', () => {
+  const added = { event: 'image_added', content_id: 'MY_F0102' };
+  assert.equal(isArtReply(added, { id: 'req-1', request: 'get_artmode_status' }), false);
+  assert.equal(isArtReply({ event: 'artmode_status', value: 'on' }, { id: 'req-1', request: 'get_artmode_status' }), true);
+  assert.equal(isArtReply({ value: 'on' }, { id: 'req-1', request: 'get_artmode_status' }), true);
+});
+
+test('art mode reads on from a few firmware shapes', () => {
+  assert.equal(artModeValue({ value: 'on' }), 'on');
+  assert.equal(artModeValue({ value: true }), 'on');
+  assert.equal(artModeValue({ art_mode: 'ON' }), 'on');
+  assert.equal(artModeValue({ event: 'image_added', content_id: 'MY_F0102' }), 'off');
 });

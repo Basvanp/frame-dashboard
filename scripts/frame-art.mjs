@@ -214,21 +214,14 @@ let notedId = null;
 
 async function reveal(tv, id) {
   if (!id) return;
-  const on = await tv.artMode().then((mode) => mode === 'on');
-  const entered = on && !artWasOn;
-  artWasOn = on;
-  if (!on) {
-    if (id !== notedId) {
-      notedId = id;
-      console.log(`${new Date().toISOString()} ${id} waiting for Art Mode`);
-    }
-    return;
-  }
+  const on = await tv.artMode().then((mode) => mode === 'on').catch(() => null);
+  const entered = on === 'on' && !artWasOn;
+  if (on === 'on' || on === 'off') artWasOn = on === 'on';
   if (!entered && id === shownId) return;
   await tv.select(id, true);
   shownId = id;
   notedId = id;
-  console.log(`${new Date().toISOString()} ${id} shown`);
+  console.log(`${new Date().toISOString()} ${id} ${on === 'on' ? 'shown' : 'selected'}`);
 }
 
 async function tick(screen, tv) {
@@ -239,7 +232,10 @@ async function tick(screen, tv) {
   const previous = [...(state.ids || [])];
   if (state.contentId && !previous.includes(state.contentId)) previous.push(state.contentId);
   await writeFile(stateFile, JSON.stringify({ contentId: id, ids: [...previous, id] }));
-  await reveal(tv, id);
+  await tv.select(id, true);
+  shownId = id;
+  notedId = id;
+  console.log(`${new Date().toISOString()} ${id} selected`);
   const left = [];
   for (const old of previous) {
     if (old === id) continue;
