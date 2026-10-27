@@ -1,0 +1,10 @@
+.git
+node_modules
+data
+plan
+android
+tizen
+public
+.env
+.env.*
+*.md

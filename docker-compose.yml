@@ -1,0 +1,21 @@
+# Art Mode loop for a machine on the same LAN as the Frame.
+# Not used by Vercel. On a Synology: see the comments in .env.example.
+services:
+  frame-art:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: frame-dashboard-art
+    container_name: frame-art
+    restart: unless-stopped
+    network_mode: host
+    env_file:
+      - .env
+    environment:
+      TZ: Europe/Amsterdam
+      CHROME_PATH: /usr/bin/chromium
+      FRAME_IN_DOCKER: "1"
+      FRAME_TOKEN_FILE: /data/frame-tv.token
+      FRAME_STATE_FILE: /data/frame-art.json
+    volumes:
+      - ./data:/data

@@ -6,6 +6,7 @@
     "dev": "node --env-file-if-exists=.env.local scripts/dev.mjs",
     "test": "node --test test/*.test.js",
     "plan:push": "node --env-file-if-exists=.env.local scripts/push-plan.mjs",
+    "art:push": "node --env-file-if-exists=.env.local scripts/frame-art.mjs",
     "shell:config": "node --env-file-if-exists=.env.local scripts/shell-config.mjs",
     "android:build": "npm run shell:config && cd android && ./gradlew assembleRelease",
     "tizen:build": "npm run shell:config && sh scripts/tizen.sh build",

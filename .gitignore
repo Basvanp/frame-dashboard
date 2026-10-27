@@ -17,3 +17,6 @@ tizen/dashboard-url.js
 android/dashboard.properties
 assets/mockup/
 .env*.local
+frame-art.json
+frame-tv.token
+data/
