@@ -319,13 +319,13 @@
     return t(h < 12 ? 'greetMorning' : h < EVENING_FROM ? 'greetAfternoon' : 'greetEvening');
   }
 
-  // The design (Settings → layout): "bleed" is full bleed by day and the
-  // salon after dark (a bright placard would glare in a dim room); "salon"
-  // keeps the gallery wall all day; "painting" keeps full bleed day and night.
+  // The design (Settings → layout): "bleed" and "painting" keep the work as
+  // the wall, day and night (night uses a dark glass placard so bone paper
+  // doesn't glare). "salon" keeps the gallery wall all day.
   function useBleed(art, night) {
     var layout = params.get('layout') || (state.data && state.data.layout) || 'bleed';
-    if (layout === 'painting') return !!art;
-    return layout === 'bleed' && !night && !!art;
+    if (layout === 'salon') return false;
+    return !!art;
   }
 
   // Full bleed: the painting a little larger than the stage, centred in the
@@ -483,6 +483,11 @@
     box.setAttribute('aria-label', label);
   }
 
+  // First ICS_URLS feed is the household calendar; the others (waste, school) stay plain.
+  function isMine(e) {
+    return e.calendar == null || e.calendar === 0;
+  }
+
   function timedEvents(day) {
     return day.events.filter(function (e) {
       return !e.allDay;
@@ -496,7 +501,7 @@
     clear(list);
 
     day.events.forEach(function (e) {
-      if (e.allDay) allday.appendChild(el('li', null, e.title));
+      if (e.allDay) allday.appendChild(el('li', isMine(e) ? 'mine' : '', e.title));
     });
 
     var timed = timedEvents(day);
@@ -537,6 +542,7 @@
       if (live && en <= t0) cls.push('past');
       if (e === lead) cls.push('lead');
       if (inProgress) cls.push('now');
+      if (isMine(e)) cls.push('mine');
 
       var li = el('li', cls.join(' '));
       li.appendChild(el('span', 'time', shortTime(e.start)));
@@ -593,14 +599,14 @@
     clear(list);
     var events = (tomorrow && tomorrow.events) || [];
     events.forEach(function (e) {
-      if (e.allDay) allday.appendChild(el('li', null, e.title));
+      if (e.allDay) allday.appendChild(el('li', isMine(e) ? 'mine' : '', e.title));
     });
     var timed = events.filter(function (e) {
       return !e.allDay && e.start;
     });
     var overflow = Math.max(0, timed.length - MAX_EVENTS);
     timed.slice(0, MAX_EVENTS).forEach(function (e) {
-      var li = el('li');
+      var li = el('li', isMine(e) ? 'mine' : '');
       li.appendChild(el('span', 'time', shortTime(e.start)));
       var what = el('div', 'what');
       what.appendChild(el('div', 'title', e.title));

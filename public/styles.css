@@ -391,12 +391,37 @@ ol {
   color: var(--lichen);
 }
 
+.allday li.mine {
+  color: var(--bone);
+  border-color: rgba(236, 230, 216, 0.48);
+  background: rgba(236, 230, 216, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38), 0 0 22px rgba(236, 230, 216, 0.18);
+}
+
 .events li {
   position: relative;
   display: flex;
   align-items: center;
   padding: 11px 0;
   border-bottom: 1px solid var(--rule-soft);
+}
+
+.events li.mine {
+  margin: 4px -16px;
+  padding: 11px 16px;
+  border-radius: 18px;
+  border-bottom-color: transparent;
+  background: linear-gradient(180deg, rgba(236, 230, 216, 0.22) 0%, rgba(236, 230, 216, 0.07) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32), 0 0 28px rgba(236, 230, 216, 0.16);
+}
+
+.events li.mine .time,
+.events li.mine .title {
+  color: var(--bone);
+}
+
+.events li.mine.lead {
+  padding: 12px 16px;
 }
 
 .events .time {
@@ -792,9 +817,34 @@ ol {
   color: var(--ink-2);
 }
 
+.bleed .allday li.mine {
+  color: var(--ink);
+  border-color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 8px 24px rgba(255, 255, 255, 0.35);
+}
+
 .bleed .events li {
   padding: 10px 0;
   border-bottom-color: var(--rule-ink);
+}
+
+.bleed .events li.mine {
+  margin: 3px -14px;
+  padding: 10px 14px;
+  border-radius: 18px;
+  border-bottom-color: transparent;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.32) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 10px 28px rgba(255, 255, 255, 0.28);
+}
+
+.bleed .events li.mine.lead {
+  padding: 12px 14px;
+}
+
+.bleed .events li.mine .time,
+.bleed .events li.mine .title {
+  color: var(--ink);
 }
 
 .bleed .events li:last-child {
@@ -906,6 +956,72 @@ ol {
 .bleed .week .is-weekend .wk-day,
 .bleed .week .is-weekend .wk-num {
   color: #9a9385;
+}
+
+/* Night: same full-bleed painting, dark glass placard so the work keeps
+   running behind the agenda instead of stopping at a salon wall. */
+.night.bleed {
+  --ink: #dcd5c6;
+  --ink-2: #b3b8ad;
+  --cobalt: #c8a45c;
+  --paper: rgba(10, 14, 12, 0.55);
+  --rule-ink: rgba(236, 230, 216, 0.16);
+  --done: #7e877d;
+}
+
+.night.bleed .placard {
+  background: rgba(10, 14, 12, 0.52);
+  border: 1px solid rgba(236, 230, 216, 0.1);
+  -webkit-backdrop-filter: blur(28px) saturate(1.2);
+  backdrop-filter: blur(28px) saturate(1.2);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.4), 0 40px 80px -24px rgba(0, 0, 0, 0.72);
+}
+
+.night.bleed .bleed-fill {
+  -webkit-filter: blur(40px) brightness(0.42) saturate(1.08);
+  filter: blur(40px) brightness(0.42) saturate(1.08);
+}
+
+.night.bleed .scrim {
+  background: linear-gradient(15deg, rgba(8, 10, 9, 0.5) 0%, rgba(8, 10, 9, 0.16) 45%, rgba(8, 10, 9, 0) 72%);
+}
+
+.night.bleed #focus-label {
+  display: block;
+  color: var(--gilt);
+}
+
+.night.bleed .block-head {
+  border-bottom-color: var(--rule);
+}
+
+.night.bleed .week {
+  border-top-color: var(--rule);
+}
+
+.night.bleed .allday li.mine {
+  color: var(--bone);
+  border-color: rgba(236, 230, 216, 0.48);
+  background: rgba(236, 230, 216, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38), 0 0 22px rgba(236, 230, 216, 0.18);
+}
+
+.night.bleed .events li.mine {
+  margin: 4px -16px;
+  padding: 11px 16px;
+  border-radius: 18px;
+  border-bottom-color: transparent;
+  background: linear-gradient(180deg, rgba(236, 230, 216, 0.22) 0%, rgba(236, 230, 216, 0.07) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32), 0 0 28px rgba(236, 230, 216, 0.16);
+}
+
+.night.bleed .events li.mine .time,
+.night.bleed .events li.mine .title {
+  color: var(--bone);
+}
+
+.night.bleed .events li.mine.lead {
+  padding: 12px 16px;
 }
 
 @media (prefers-reduced-motion: reduce) {
