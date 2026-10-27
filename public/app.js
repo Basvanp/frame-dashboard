@@ -329,10 +329,13 @@
     return layout === 'bleed' && !night && !!art;
   }
 
-  // Full bleed: the painting at full height, centred in the area left of the
-  // placard (x < 1228). Wide works simply fill the screen.
+  // Full bleed: the painting a little larger than the stage, centred in the
+  // area left of the placard (x < 1228). Wide works simply fill the screen.
   function placeBleed(img, ratio) {
-    var w = Math.round(1080 * ratio);
+    var h = Math.round(1080 * 1.08);
+    var w = Math.round(h * ratio);
+    img.style.height = h + 'px';
+    img.style.top = Math.round((1080 - h) / 2) + 'px';
     if (w >= 1920) {
       img.style.left = '0px';
       img.style.width = '1920px';
@@ -360,7 +363,7 @@
 
   // The painting is centred on the wall above the label shelf. Canvas gets a
   // gilt frame (16 + 5 liner); paper gets a black frame and a 48px mat.
-  var HANG = { cx: 570, cy: 507, maxW: 888, maxH: 694 };
+  var HANG = { cx: 570, cy: 500, maxW: 980, maxH: 760 };
 
   function hangArt(art) {
     if (!art || state.artShown === art.image) return;

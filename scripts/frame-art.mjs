@@ -208,6 +208,25 @@ async function readState() {
   }
 }
 
+let artWasOn = false;
+
+async function inArtMode(tv) {
+  return tv.artMode().then((mode) => mode === 'on').catch(() => false);
+}
+
+// Never select_image while a programme is on: on this Frame that pulls Art Mode
+// over the picture. Upload still happens so the file is ready; we only show it
+// when Art Mode is already on, or the moment the set enters Art Mode.
+async function showIfArt(tv, id) {
+  if (!id) return false;
+  const on = await inArtMode(tv);
+  const entered = on && !artWasOn;
+  artWasOn = on;
+  if (!on) return false;
+  await tv.select(id, true);
+  return entered;
+}
+
 async function tick(screen, tv) {
   console.log('Capturing the dashboard');
   const jpeg = await screen.jpeg();
@@ -216,7 +235,7 @@ async function tick(screen, tv) {
   const previous = [...(state.ids || [])];
   if (state.contentId && !previous.includes(state.contentId)) previous.push(state.contentId);
   await writeFile(stateFile, JSON.stringify({ contentId: id, ids: [...previous, id] }));
-  await tv.select(id, true);
+  await showIfArt(tv, id);
   const left = [];
   for (const old of previous) {
     if (old === id) continue;
@@ -228,12 +247,20 @@ async function tick(screen, tv) {
     }
   }
   await writeFile(stateFile, JSON.stringify({ contentId: id, ids: left }));
-  console.log(`${new Date().toISOString()} ${id} ${(jpeg.length / 1024).toFixed(0)}kb uploaded, replaced ${state.contentId || 'nothing'}`);
+  const how = shown || artWasOn ? 'shown' : 'queued';
+  console.log(`${new Date().toISOString()} ${id} ${(jpeg.length / 1024).toFixed(0)}kb ${how}, replaced ${state.contentId || 'nothing'}`);
 }
 
-async function waitForNextMinute() {
-  const wait = 60_000 - (Date.now() % 60_000) + 1500;
-  if (wait > 0) await sleep(wait);
+async function waitForNextMinute(tv) {
+  const deadline = Date.now() + (60_000 - (Date.now() % 60_000)) + 1500;
+  while (!stopped && Date.now() < deadline) {
+    const state = await readState();
+    if (state.contentId && !artWasOn) {
+      const shown = await showIfArt(tv, state.contentId);
+      if (shown) console.log(`${new Date().toISOString()} ${state.contentId} shown (Art Mode)`);
+    }
+    await sleep(Math.min(8000, Math.max(0, deadline - Date.now())));
+  }
 }
 
 function lanHosts() {
@@ -316,13 +343,14 @@ do {
       linked = true;
       console.log(`Frame ${host}:${port} linked. A JPEG goes up at each new minute.`);
     }
-    if (!once && !first) await waitForNextMinute();
+    if (!once && !first) await waitForNextMinute(tv);
     first = false;
     if (stopped) break;
     await tick(screen, tv);
   } catch (err) {
     console.error(err.message);
     linked = false;
+    artWasOn = false;
     tv.close();
     if (/Chrome|devtools|dashboard did not|painting/.test(err.message)) screen.stop();
     if (once) process.exit(1);
