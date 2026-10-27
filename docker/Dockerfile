@@ -11,7 +11,7 @@ RUN apt-get update \
 
 WORKDIR /app
 COPY package.json ./
-COPY lib/frame-art.js lib/frame-art.js
+COPY lib/frame-art.js lib/tv-socket.js lib/
 COPY scripts/frame-art.mjs scripts/frame-art.mjs
 
 VOLUME /data
