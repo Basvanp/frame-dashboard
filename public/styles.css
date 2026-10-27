@@ -306,7 +306,7 @@ ol {
   height: 940px;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* app.js trims the to-do list to fit; never spill */
+  overflow: hidden;
 }
 
 .eyebrow {
@@ -465,8 +465,11 @@ ol {
 }
 
 .events .title {
-  font-size: 26px;
-  line-height: 32px;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 34px;
+  letter-spacing: -0.01em;
 }
 
 .events .where {
@@ -503,9 +506,9 @@ ol {
 }
 
 .events .lead .title {
-  font-size: 29px;
-  line-height: 36px;
-  font-weight: 500;
+  font-size: 32px;
+  line-height: 38px;
+  font-weight: 400;
 }
 
 .events .now::before {
@@ -534,59 +537,6 @@ ol {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-.tasks.under-plan {
-  margin-top: 6px;
-}
-
-.tasks li {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  padding: 6px 0;
-}
-
-.tick {
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;
-  border-radius: 11px;
-  border: 1.5px solid var(--lichen);
-}
-
-.task-text {
-  flex: 1;
-  min-width: 0;
-  font-size: 25px;
-  line-height: 30px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tag {
-  flex-shrink: 0;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 18px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--lichen);
-}
-
-.tag.carried {
-  color: var(--gilt);
-}
-
-.tasks .done .tick {
-  border-color: #6f7a70;
-  background: #6f7a70;
-}
-
-.tasks .done .task-text {
-  color: var(--faint);
-  text-decoration: line-through;
 }
 
 .more,
@@ -905,8 +855,9 @@ ol {
 
 .bleed .events .title,
 .bleed .events .lead .title {
-  font-size: 24px;
-  line-height: 30px;
+  font-size: 26px;
+  line-height: 32px;
+  color: var(--ink);
 }
 
 .bleed .events .lead .time {
@@ -933,39 +884,6 @@ ol {
   font-size: 26px;
   line-height: 32px;
   color: var(--ink);
-}
-
-.bleed .tasks li {
-  gap: 16px;
-  padding: 5px 0;
-}
-
-.bleed .tick {
-  width: 20px;
-  height: 20px;
-  border-color: var(--ink);
-}
-
-.bleed .task-text {
-  font-size: 23px;
-  line-height: 28px;
-}
-
-.bleed .tag {
-  color: var(--ink-2);
-}
-
-.bleed .tag.carried {
-  color: var(--cobalt);
-}
-
-.bleed .tasks .done .tick {
-  border-color: #9a9385;
-  background: #9a9385;
-}
-
-.bleed .tasks .done .task-text {
-  color: var(--done);
 }
 
 .bleed .more,

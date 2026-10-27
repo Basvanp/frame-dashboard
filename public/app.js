@@ -14,8 +14,7 @@
   var REFRESH_MS = 5 * 60 * 1000; // full rebuild: picks up calendar-feed changes
   var VERSION_MS = 20 * 1000; // cheap "did anything change?" check
   var BROWSE_RESET_MS = 45 * 1000;
-  var MAX_EVENTS = 4;
-  var MAX_TASKS = 14; // the layout trims to what actually fits, see fitTasks()
+  var MAX_EVENTS = 7;
   var EVENING_FROM = 19; // the wall goes dark and the right side turns to tomorrow
   var NIGHT_UNTIL = 6; // after midnight it stays dark, but shows the new day
 
@@ -580,61 +579,6 @@
       });
   }
 
-  function renderTasks(day, carried, evening) {
-    var list = $('tasks');
-    clear(list);
-
-    var own = tasksOf(day);
-    var known = {};
-    own.forEach(function (x) {
-      known[x.text.toLowerCase()] = true;
-    });
-    var extra = (carried || []).filter(function (x) {
-      return !known[x.text.toLowerCase()];
-    });
-
-    var open = own.filter(function (x) {
-      return !x.done;
-    });
-    var done = own.filter(function (x) {
-      return x.done;
-    });
-    var all = open
-      .map(function (x) {
-        return { task: x };
-      })
-      .concat(
-        extra.map(function (x) {
-          return { task: x, carried: true };
-        })
-      )
-      .concat(
-        done.map(function (x) {
-          return { task: x };
-        })
-      );
-
-    $('tasks-count').textContent = evening
-      ? plural('planned', open.length + extra.length)
-      : own.length
-      ? t('doneOf', { d: done.length, n: own.length })
-      : '';
-
-    if (!all.length) {
-      list.appendChild(el('li', 'empty-line', t('noTasks')));
-      return;
-    }
-
-    all.slice(0, MAX_TASKS).forEach(function (item) {
-      var li = el('li', item.task.done ? 'done' : '');
-      li.appendChild(el('span', 'tick'));
-      li.appendChild(el('span', 'task-text', item.task.text));
-      if (item.carried) li.appendChild(el('span', 'tag carried', t('fromToday')));
-      else if (item.task.tag) li.appendChild(el('span', 'tag', item.task.tag));
-      list.appendChild(li);
-    });
-    fitTasks(list, all.length);
-  }
 
   function dayStamp(ymd) {
     return fmtDay(ymd, { weekday: 'short' }).replace(/\./g, '').toUpperCase() + ' ' + Number(ymd.slice(8));
@@ -644,7 +588,6 @@
     var line = $('tomorrow-focus');
     line.hidden = !text;
     line.textContent = text || '';
-    $('tasks').classList.toggle('under-plan', !!text);
   }
 
   function clearTomorrowAgenda() {
@@ -678,22 +621,14 @@
     return events.length;
   }
 
-  // Daytime placard: tomorrow's focus, then its appointments, then its tasks.
-  // Evening already turns the whole column into tomorrow, so that path keeps
-  // the task list under the headline instead of repeating the focus.
+  // Daytime placard: tomorrow's focus and appointments. Evening already turns
+  // the whole column into tomorrow, so that block is hidden.
   function renderTomorrow(tomorrow) {
     var focus = tomorrow && tomorrow.focus;
     setTomorrowLine(focus || '');
     $('tasks-label').textContent = t('tomorrow');
     $('tasks-count').textContent = tomorrow ? dayStamp(tomorrow.date) : '';
-    var nEvents = renderTomorrowAgenda(tomorrow);
-    if (!tomorrow || !tasksOf(tomorrow).length) {
-      clear($('tasks'));
-      if (!focus && !nEvents) $('tasks').appendChild(el('li', 'empty-line', t('noTasks')));
-      return;
-    }
-    renderTasks(tomorrow, [], true);
-    $('tasks-count').textContent = dayStamp(tomorrow.date);
+    renderTomorrowAgenda(tomorrow);
   }
 
   var MEDIUMS_ES = {
@@ -709,25 +644,6 @@
   function medium(m) {
     if (!m || lang() !== 'es') return m;
     return MEDIUMS_ES[m.toLowerCase()] || m;
-  }
-
-  // Show as many to-dos as the column has room for: drop rows from the end
-  // (finished ones sink there first) until nothing overflows, and say how
-  // many are hidden. Uses layout sizes, which the stage's scale() ignores.
-  function fitTasks(list, total) {
-    var day = $('day');
-    var fits = function () {
-      return day.scrollHeight <= day.clientHeight + 1;
-    };
-    if (fits()) return;
-    var more = el('li', 'more');
-    list.appendChild(more);
-    var rows = list.querySelectorAll('li:not(.more)');
-    for (var i = rows.length - 1; i >= 1; i--) {
-      list.removeChild(rows[i]);
-      more.textContent = t('more', { n: total - i });
-      if (fits()) return;
-    }
   }
 
   var WORDS = {
@@ -872,12 +788,12 @@
 
     renderEvents(day, live);
     if (!state.selected && !evening) {
+      $('ahead').hidden = false;
       renderTomorrow(state.data.tomorrow);
     } else {
+      $('ahead').hidden = true;
       setTomorrowLine('');
       clearTomorrowAgenda();
-      $('tasks-label').textContent = evening ? t('tasksTomorrow') : t('tasks');
-      renderTasks(day, carried, evening);
     }
 
     var recap = $('recap');
