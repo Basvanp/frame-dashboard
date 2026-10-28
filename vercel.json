@@ -12,7 +12,7 @@
       "headers": [
         {
           "key": "X-Robots-Tag",
-          "value": "noindex"
+          "value": "noindex, nofollow, noarchive, nosnippet"
         },
         {
           "key": "Referrer-Policy",
