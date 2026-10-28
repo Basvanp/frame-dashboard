@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { expandIcs } from '../lib/calendar.js';
+import { expandIcs, icsFeeds } from '../lib/calendar.js';
 import { mondayOf, weekDays } from '../lib/time.js';
 
 const TZ = 'America/Monterrey';
@@ -10,6 +10,7 @@ const days = weekDays('2026-10-12');
 const ics = `BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//test//EN
+X-WR-CALNAME:Demo
 BEGIN:VTIMEZONE
 TZID:America/Monterrey
 BEGIN:STANDARD
@@ -90,4 +91,32 @@ test('cancelled events are dropped', () => {
 test('mondayOf', () => {
   assert.equal(mondayOf('2026-10-18'), '2026-10-12');
   assert.equal(mondayOf('2026-10-12'), '2026-10-12');
+});
+
+test('ICS_LABELS line up with ICS_URLS, first feed unlabeled on the wall', () => {
+  const prevUrls = process.env.ICS_URLS;
+  const prevLabels = process.env.ICS_LABELS;
+  process.env.ICS_URLS = 'https://example/huis.ics,https://example/afval.ics';
+  process.env.ICS_LABELS = 'huis,afval';
+  try {
+    assert.deepEqual(icsFeeds(), [
+      { url: 'https://example/huis.ics', label: 'huis' },
+      { url: 'https://example/afval.ics', label: 'afval' },
+    ]);
+  } finally {
+    if (prevUrls == null) delete process.env.ICS_URLS;
+    else process.env.ICS_URLS = prevUrls;
+    if (prevLabels == null) delete process.env.ICS_LABELS;
+    else process.env.ICS_LABELS = prevLabels;
+  }
+});
+
+test('a later feed without ICS_LABELS takes the calendar name from the ICS', () => {
+  const tagged = expandIcs(ics, days, TZ, 1);
+  assert.equal(tagged.find((e) => e.title === 'Standup').label, 'Demo');
+});
+
+test('the household feed stays unlabeled unless ICS_LABELS names it', () => {
+  const house = expandIcs(ics, days, TZ, 0);
+  assert.equal(house.find((e) => e.title === 'Standup').label, null);
 });

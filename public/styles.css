@@ -314,6 +314,15 @@ ol {
   color: var(--bone);
 }
 
+.weather-meta {
+  margin-top: 4px;
+  max-width: 120px;
+  font-size: 15px;
+  line-height: 18px;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
 .kicker {
   font-weight: 500;
   font-size: 15px;
@@ -398,6 +407,14 @@ ol {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38), 0 0 22px rgba(236, 230, 216, 0.18);
 }
 
+.allday .cal {
+  margin-left: 8px;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
 .events li {
   position: relative;
   display: flex;
@@ -457,6 +474,14 @@ ol {
   font-size: 18px;
   line-height: 24px;
   color: var(--lichen);
+}
+
+.events .cal {
+  font-size: 13px;
+  line-height: 18px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
 }
 
 .events .tail {
@@ -770,6 +795,10 @@ ol {
   color: var(--ink);
 }
 
+.bleed .weather-meta {
+  color: var(--cobalt);
+}
+
 .bleed .focus {
   padding-top: 20px;
 }
@@ -869,6 +898,11 @@ ol {
 .bleed .events .lead .time {
   font-weight: 600;
   color: var(--cobalt);
+}
+
+.bleed .allday .cal,
+.bleed .events .cal {
+  color: var(--ink-2);
 }
 
 .bleed .events .where,

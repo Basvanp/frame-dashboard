@@ -15,7 +15,7 @@
   var VERSION_MS = 20 * 1000; // cheap "did anything change?" check
   var BROWSE_RESET_MS = 45 * 1000;
   var MAX_EVENTS = 7;
-  var EVENING_FROM = 19; // the wall goes dark and the right side turns to tomorrow
+  var EVENING_FROM = 19; // fallback if today's sunset hasn't arrived yet
   var NIGHT_UNTIL = 6; // after midnight it stays dark, but shows the new day
 
   var STRINGS = {
@@ -148,7 +148,7 @@
   };
 
   // Same index in every language, picked from the date so Art Mode doesn't flicker.
-  // Which list depends on the hour: morning until noon, afternoon until 19:00,
+  // Which list depends on the hour: morning until noon, afternoon until sunset,
   // evening after that and until the wall lights up again at 6.
   var SAYINGS = {
     nl: {
@@ -400,11 +400,21 @@
     return null;
   }
 
+  // Sunset comes from Open-Meteo in the dashboard's zone. Until it arrives,
+  // 19:00 is the fallback so a missing forecast doesn't pin the wall to day.
+  function pastSunset() {
+    var w = state.data && state.data.weather;
+    var p = localParts(now());
+    if (!w || w.sunsetHour == null) return p.hour >= EVENING_FROM;
+    if (p.hour !== w.sunsetHour) return p.hour > w.sunsetHour;
+    return p.minute >= (w.sunsetMinute || 0);
+  }
+
   function isNight() {
     var mode = params.get('mode') || 'auto';
     if (mode !== 'auto') return mode === 'night';
     var h = localParts(now()).hour;
-    return h >= EVENING_FROM || h < NIGHT_UNTIL;
+    return pastSunset() || h < NIGHT_UNTIL;
   }
 
   // In the evening, the wall text turns to tomorrow. After midnight it is the
@@ -413,13 +423,13 @@
     var mode = params.get('mode');
     if (mode === 'night') return true;
     if (mode === 'day') return false;
-    return localParts(now()).hour >= EVENING_FROM;
+    return pastSunset();
   }
 
   // Before 6 the wall is still dark, so the line stays an evening one.
   function partOfDay() {
     var h = localParts(now()).hour;
-    if (h >= EVENING_FROM || h < NIGHT_UNTIL) return 'evening';
+    if (pastSunset() || h < NIGHT_UNTIL) return 'evening';
     if (h < 12) return 'morning';
     return 'afternoon';
   }
@@ -581,6 +591,7 @@
 
   function renderWeather() {
     var box = $('weather');
+    var meta = $('weather-meta');
     var w = state.data && state.data.weather;
     if (!w || w.temp == null || !w.kind) {
       box.hidden = true;
@@ -592,14 +603,39 @@
       (ICONS[w.kind] || ICONS.cloudy) +
       '</svg>';
     $('weather-temp').textContent = w.temp + '°';
+    var bits = [];
+    if (w.low != null && w.high != null) bits.push(w.low + '–' + w.high + '°');
+    else if (w.high != null) bits.push(w.high + '°');
+    if (w.rain) bits.push(w.rain + '%');
+    meta.textContent = bits.join(' · ');
+    meta.hidden = !bits.length;
     var label = w.temp + '°, ' + t('wx_' + w.kind);
-    if (w.high != null) label += ', ' + w.high + '°';
+    if (w.low != null && w.high != null) label += ', ' + w.low + '–' + w.high + '°';
+    if (w.rain) label += ', ' + w.rain + '%';
     box.setAttribute('aria-label', label);
   }
 
-  // First ICS_URLS feed is the household calendar; the others (waste, school) stay plain.
+  // First ICS_URLS feed is the household calendar (glass glow). Later feeds
+  // get a short tag from ICS_LABELS — afval, school, and so on.
   function isMine(e) {
     return e.calendar == null || e.calendar === 0;
+  }
+
+  function calTag(e) {
+    var name = e.label;
+    if (!name && state.data && state.data.calendars && e.calendar != null) {
+      name = state.data.calendars[e.calendar];
+    }
+    if (!name || isMine(e)) return '';
+    return String(name).slice(0, 16);
+  }
+
+  function alldayRow(e) {
+    var li = el('li', isMine(e) ? 'mine' : '');
+    li.appendChild(document.createTextNode(e.title));
+    var tag = calTag(e);
+    if (tag) li.appendChild(el('span', 'cal', tag));
+    return li;
   }
 
   function timedEvents(day) {
@@ -615,7 +651,7 @@
     clear(list);
 
     day.events.forEach(function (e) {
-      if (e.allDay) allday.appendChild(el('li', isMine(e) ? 'mine' : '', e.title));
+      if (e.allDay) allday.appendChild(alldayRow(e));
     });
 
     var timed = timedEvents(day);
@@ -662,6 +698,8 @@
       li.appendChild(el('span', 'time', shortTime(e.start)));
       var what = el('div', 'what');
       what.appendChild(el('div', 'title', e.title));
+      var tag = calTag(e);
+      if (tag) what.appendChild(el('div', 'cal', tag));
       if (e === lead && e.location) what.appendChild(el('div', 'where', e.location.split('\n')[0]));
       li.appendChild(what);
 
@@ -713,7 +751,7 @@
     clear(list);
     var events = (tomorrow && tomorrow.events) || [];
     events.forEach(function (e) {
-      if (e.allDay) allday.appendChild(el('li', isMine(e) ? 'mine' : '', e.title));
+      if (e.allDay) allday.appendChild(alldayRow(e));
     });
     var timed = events.filter(function (e) {
       return !e.allDay && e.start;
@@ -724,6 +762,8 @@
       li.appendChild(el('span', 'time', shortTime(e.start)));
       var what = el('div', 'what');
       what.appendChild(el('div', 'title', e.title));
+      var tag = calTag(e);
+      if (tag) what.appendChild(el('div', 'cal', tag));
       li.appendChild(what);
       list.appendChild(li);
     });
